@@ -1,0 +1,1605 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>Gradient Generator</title>
+  <style>
+    :root{
+      --ios-bg:#f2f2f7;
+      --ios-text:#1c1c1e;
+      --ios-sub:#8e8e93;
+      --ios-sep:rgba(60,60,67,.18);
+      --ios-card:#ffffff; /* solid */
+      --ios-shadow:0 20px 60px rgba(0,0,0,.22);
+      --ios-blue:#007aff;
+      --ios-btn:rgba(120,120,128,.18);
+      --ios-btn-press:rgba(120,120,128,.30);
+      --radius-lg:20px;
+
+      /* Toggle selected styling */
+      --toggle-border: #000000;
+      --toggle-color:  #000000;
+    }
+
+    html, body{
+      height:100%;
+      width:100%;
+      overflow:hidden;
+      position:fixed;
+      touch-action:none;
+      -webkit-user-select:none;
+    }
+    body{
+      font-family:-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      padding:30px 20px;
+      margin:0;
+      background-color:var(--ios-bg);
+      color:var(--ios-text);
+      box-sizing:border-box;
+    }
+    input, button{ -webkit-user-select:text; }
+
+    @media (prefers-color-scheme: dark){
+      :root{
+        --ios-bg:#000000;
+        --ios-text:#f2f2f7;
+        --ios-sub:#8e8e93;
+        --ios-sep:rgba(84,84,88,.55);
+        --ios-card:#1c1c1e; /* solid */
+        --ios-shadow:0 26px 80px rgba(0,0,0,.55);
+        --ios-btn:rgba(120,120,128,.24);
+        --ios-btn-press:rgba(120,120,128,.36);
+
+        /* Toggle styling in dark mode */
+        --toggle-border: #f2f2f7;
+        --toggle-color:  #f2f2f7;
+      }
+      input{
+        background-color:#1c1c1e;
+        color:#ffffff;
+        border:1px solid #3a3a3c;
+      }
+      .section-label, .sub-label, .status{ color:var(--ios-sub); }
+      .btn{ background:#2563eb; color:#fff; }
+      .btn-alt{ background:#2c2c2e; color:#fff; border:1px solid #3a3a3c; }
+      .panel{ background:#0b0b0c; border:1px solid #1f1f22; }
+      .color-row .row-label{ color:var(--ios-sub); }
+      .info-btn{ color:#f2f2f7; }
+      .modal-card{ background:#0b0b0c; border:1px solid #1f1f22; }
+      .modal-title{ color:#f2f2f7; }
+      .modal-text{ color:#d1d5db; }
+      .modal-close{ background:#2c2c2e; color:#fff; border:1px solid #3a3a3c; }
+    }
+
+    /* Locked vs scrollable modes (toggled by JS) */
+    html.locked, body.locked{
+      overflow:hidden;
+      position:fixed;
+      touch-action:none;
+    }
+    html.scrollable, body.scrollable{
+      overflow:auto;
+      position:static;
+      touch-action:pan-y;
+      -webkit-overflow-scrolling:touch;
+    }
+
+    /* Preview row */
+    .preview-row{ width:100%; height:160px; position:relative; margin-bottom:18px; }
+    .visualizer-container{ width:100%; height:100%; display:flex; justify-content:center; align-items:center; }
+    #vector-rect{ transition:all .25s cubic-bezier(.25,.1,.25,1); }
+
+    .section{ display:flex; flex-direction:column; align-items:center; width:100%; margin-bottom:18px; }
+    .sub-label{
+      font-size:12px; font-weight:700; color:var(--ios-sub);
+      text-transform:uppercase; letter-spacing:.8px;
+    }
+    .section-label{
+      font-size:14px; font-weight:700; margin-bottom:12px;
+      text-transform:uppercase; letter-spacing:1px; color:var(--ios-sub);
+    }
+
+    /* Resolution row */
+    .input-row{
+      display:flex; align-items:center; justify-content:center;
+      gap:14px; font-size:24px; font-weight:500; flex-wrap:wrap;
+    }
+    .input-col{ display:flex; flex-direction:column; align-items:center; gap:6px; }
+    .separator{ padding-top:20px; }
+
+    input[type="number"], input[type="text"]{
+      width:110px; padding:12px; font-size:20px; text-align:center;
+      border-radius:10px; border:1px solid #c7c7cc;
+      -webkit-appearance:none; outline:none; background:#fff; color:var(--ios-text);
+      box-sizing:border-box;
+    }
+    input:focus{ border-color:var(--ios-blue); }
+
+    /* --- Resolution Toolbar --- */
+    .res-toolbar{
+      width: 100%;
+      max-width: 520px;
+      margin-top: 12px;
+      display:flex;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 10px 10px;
+      box-sizing:border-box;
+      border-radius: 16px;
+      background: rgba(255,255,255,.55);
+      border: 1px solid rgba(0,0,0,.06);
+      backdrop-filter: blur(10px);
+    }
+    @media (prefers-color-scheme: dark){
+      .res-toolbar{
+        background: #0b0b0c;
+        border: 1px solid #1f1f22;
+        backdrop-filter: none;
+      }
+    }
+
+    .tb-btn{
+      flex: 1 1 0;
+      min-width: 0;
+      height: 44px;
+      border: none;
+      border-radius: 14px;
+      background: var(--ios-btn);
+      color: var(--ios-sub);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      gap: 8px;
+      -webkit-appearance:none;
+      padding: 0 10px;
+      box-shadow: 0 0.5px 0 rgba(0,0,0,.08) inset;
+      user-select:none;
+      -webkit-tap-highlight-color: transparent;
+      outline: none;
+    }
+    .tb-btn:active{
+      transform: scale(.99);
+      background: var(--ios-btn-press);
+    }
+    .tb-btn svg{
+      width: 22px;
+      height: 22px;
+      display:block;
+      stroke: currentColor;
+    }
+    .tb-text{
+      font-weight: 900;
+      font-size: 16px;
+      letter-spacing: .2px;
+      line-height: 1;
+      color: currentColor;
+    }
+
+    /* Toggle-selected state for x2/x3 */
+    .tb-btn.tb-toggle-selected{
+      box-shadow:
+        0 0.5px 0 rgba(0,0,0,.08) inset,
+        0 0 0 2px var(--toggle-border);
+      color: var(--toggle-color);
+      background: rgba(0,0,0,.05);
+    }
+    @media (prefers-color-scheme: dark){
+      .tb-btn.tb-toggle-selected{
+        background: rgba(255,255,255,.08);
+      }
+    }
+
+    /* Angle icon wrapper uses rotation */
+    .tb-angle-rotator{
+      width: 24px;
+      height: 24px;
+      transform-origin: 50% 50%;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      will-change: transform;
+    }
+    .tb-angle-rotator svg{ width:24px; height:24px; }
+
+    /* Color panel */
+    .panel{
+      width:100%;
+      background:rgba(255,255,255,.55);
+      border:1px solid rgba(0,0,0,.06);
+      border-radius:16px;
+      padding:14px;
+      box-sizing:border-box;
+      backdrop-filter:blur(10px);
+    }
+
+    .colors-header{ width:100%; display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:10px; }
+    .colors-header-left{ display:flex; align-items:center; gap:3px; min-width:0; }
+    .colors-title{
+      margin:0; font-size:14px; font-weight:700; text-transform:uppercase;
+      letter-spacing:1px; color:var(--ios-sub); white-space:nowrap;
+    }
+    .info-btn{
+      border:none; background:transparent; padding:6px 6px; margin:0;
+      font-weight:600; font-size:16px; line-height:1;
+      border-radius:10px; color:var(--ios-text); -webkit-appearance:none;
+    }
+    .info-btn:active{ transform:scale(.98); }
+
+    .btn-row{ display:flex; gap:10px; }
+
+    .btn, .btn-alt{
+      border:none; border-radius:12px; padding:10px 14px;
+      font-weight:800; font-size:18px; -webkit-appearance:none;
+    }
+    .btn{ background:#2563eb; color:#fff; }
+    .btn:active{ transform:scale(.99); }
+    .btn-alt{ background:#e2e8f0; color:#0f172a; }
+
+    /* (4) PLUS / MINUS: circular + equal width/height */
+    #minusBtn, #plusBtn{
+      width: 44px;
+      height: 44px;
+      padding: 0;
+      border-radius: 999px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-size: 22px;
+      font-weight: 900;
+      line-height: 1;
+      -webkit-tap-highlight-color: transparent;
+      user-select:none;
+    }
+
+    .colors-list{ display:flex; flex-direction:column; gap:10px; width:100%; }
+    .color-row{ display:flex; align-items:center; gap:8px; width:100%; flex-wrap:nowrap; min-width:0; }
+    .color-row .row-label{
+      width:108px; font-size:12px; font-weight:800; color:#64748b;
+      text-transform:uppercase; letter-spacing:.6px;
+      flex:0 0 auto; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+    }
+    .color-row input.color-text{
+      flex:1 1 auto; min-width:0; width:auto;
+      text-align:left; padding:10px 10px; font-size:15px;
+    }
+
+    /* iOS-like color picker icon */
+    .picker-wrap{ position:relative; width:34px; height:34px; flex:0 0 auto; }
+    .picker-ios{
+      position:absolute; inset:0; border-radius:999px;
+      background:conic-gradient(#ff3b30,#ff9500,#ffcc00,#34c759,#00c7be,#007aff,#5856d6,#af52de,#ff2d55,#ff3b30);
+      display:flex; align-items:center; justify-content:center;
+      box-shadow:none;
+    }
+    .picker-ios::before{
+      content:""; width:25px; height:25px; border-radius:999px;
+      background:rgba(255,255,255,.92);
+      box-shadow:0 0 0 .5px rgba(0,0,0,.12);
+    }
+    .picker-center{
+      position:absolute; left:50%; top:50%;
+      transform:translate(-50%,-50%);
+      width:18px; height:18px; border-radius:999px; background:#fff;
+      box-shadow:0 0 0 1.5px rgba(255,255,255,.95), 0 0 0 .5px rgba(0,0,0,.20);
+    }
+    input.color-native{
+      position:absolute; inset:0; opacity:.001;
+      width:100%; height:100%; border:none; padding:0; margin:0;
+      -webkit-appearance:none; background:transparent;
+    }
+
+    .footer{ width:100%; margin-top:6px; display:flex; flex-direction:column; gap:10px; align-items:center; }
+    .status{ width:100%; text-align:center; font-size:13px; font-weight:700; color:#64748b; min-height:18px; }
+
+    #renderCanvas{ display:none; }
+
+    /* Color help modal */
+    .modal-backdrop{
+      position:fixed; inset:0; background:rgba(0,0,0,.35);
+      display:none; align-items:center; justify-content:center;
+      padding:22px; box-sizing:border-box; z-index:999;
+    }
+    .modal-backdrop.show{ display:flex; }
+    .modal-card{
+      width:100%; max-width:520px; border-radius:18px; background:#fff;
+      border:1px solid rgba(0,0,0,.08);
+      box-shadow:0 20px 55px rgba(15,23,42,.22);
+      padding:16px 16px 14px 16px; box-sizing:border-box;
+    }
+    .modal-title{
+      font-weight:900; font-size:14px; letter-spacing:1px; text-transform:uppercase;
+      color:#111827; margin:2px 0 10px 0;
+    }
+    .modal-text{
+      font-size:14px; line-height:1.35; color:#334155; font-weight:600;
+      margin:0 0 12px 0;
+    }
+    .modal-text code{
+      font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono","Courier New", monospace;
+      font-size:12px; font-weight:800;
+    }
+    .modal-close{
+      width:100%; border:none; border-radius:12px; padding:12px 14px;
+      font-weight:900; font-size:16px; -webkit-appearance:none;
+      background:#e2e8f0; color:#0f172a;
+    }
+    .modal-close:active{ transform:scale(.99); }
+
+    /* ANGLE POPUP */
+    .deg-backdrop{
+      position:fixed;
+      inset:0;
+      display:none;
+      align-items:center;
+      justify-content:center;
+      padding:22px;
+      box-sizing:border-box;
+      z-index:1000;
+      background: rgba(0,0,0,.28);
+    }
+    .deg-backdrop.show{ display:flex; }
+
+    .deg-card{
+      width:100%;
+      max-width:520px;
+      border-radius: var(--radius-lg);
+      background: var(--ios-card);
+      border: 1px solid rgba(0,0,0,.10);
+      box-shadow: var(--ios-shadow);
+      overflow:hidden;
+    }
+    .deg-sheet{
+      padding: 16px 16px 14px 16px;
+      box-sizing:border-box;
+      text-align:center;
+    }
+    .deg-title{
+      font-weight:800;
+      font-size:13px;
+      letter-spacing:.9px;
+      text-transform:uppercase;
+      color: var(--ios-sub);
+      margin: 0 0 14px 0;
+    }
+    .deg-big-wrap{
+      width:120px; height:120px;
+      margin: 0 auto 10px auto;
+      display:flex; align-items:center; justify-content:center;
+    }
+    .deg-big-rotator{
+      width:120px; height:120px;
+      transform-origin:50% 50%;
+      display:flex; align-items:center; justify-content:center;
+      will-change:transform;
+    }
+    .deg-big-rotator svg{ width:120px; height:120px; display:block; }
+
+    .deg-angle-row{
+      display:flex;
+      justify-content:center;
+      align-items:center;
+      margin: 2px 0 14px 0;
+    }
+    .deg-angle-input{
+      width: 96px;
+      padding: 10px 10px;
+      font-size: 18px;
+      font-weight: 800;
+      text-align: center;
+      border-radius: 12px;
+      border: 1px solid rgba(60,60,67,.22);
+      -webkit-appearance: none;
+      outline: none;
+      background: rgba(120,120,128,.10);
+      color: var(--ios-text);
+      box-sizing: border-box;
+    }
+    .deg-angle-input:focus{
+      border-color: var(--ios-blue);
+      background: rgba(0,122,255,.08);
+    }
+    .preset-row{
+      display:flex;
+      justify-content:center;
+      gap:10px;
+      flex-wrap:nowrap;
+      margin-bottom:10px;
+    }
+    .preset-btn{
+      border:none;
+      border-radius:12px;
+      padding:8px 17px;
+      font-weight:800;
+      font-size:15px;
+      background: var(--ios-btn);
+      color: var(--ios-text);
+      -webkit-appearance:none;
+      min-width:0;
+      white-space:nowrap;
+      line-height:1;
+      box-shadow: 0 0.5px 0 rgba(0,0,0,.08) inset;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+    }
+    .preset-btn:active{
+      transform:scale(.99);
+      background: var(--ios-btn-press);
+    }
+    .deg-divider{
+      height:1px;
+      background: var(--ios-sep);
+      margin: 12px 0;
+    }
+    .deg-close{
+      width:100%;
+      border:none;
+      padding:14px 14px;
+      font-weight:900;
+      font-size:17px;
+      -webkit-appearance:none;
+      background: transparent;
+      color: var(--ios-blue);
+    }
+    .deg-close:active{
+      background: rgba(0,122,255,.12);
+    }
+
+    /* PRESETS POPUP */
+    .preset-backdrop{
+      position:fixed;
+      inset:0;
+      display:none;
+      align-items:center;
+      justify-content:center;
+      padding:22px;
+      box-sizing:border-box;
+      z-index:1001;
+      background: rgba(0,0,0,.28);
+    }
+    .preset-backdrop.show{ display:flex; }
+
+    .preset-card{
+      width:100%;
+      max-width:520px;
+      border-radius: var(--radius-lg);
+      background: var(--ios-card);
+      border: 1px solid rgba(0,0,0,.10);
+      box-shadow: var(--ios-shadow);
+      overflow:hidden;
+    }
+    .preset-sheet{
+      padding: 16px 16px 14px 16px;
+      box-sizing:border-box;
+      text-align:center;
+    }
+    .preset-title{
+      font-weight:800;
+      font-size:13px;
+      letter-spacing:.9px;
+      text-transform:uppercase;
+      color: var(--ios-sub);
+      margin: 0 0 14px 0;
+    }
+    .preset-grid{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+    .preset-item{
+      border:none;
+      border-radius:12px;
+      padding: 12px 10px;
+      background: var(--ios-btn);
+      color: var(--ios-text);
+      font-weight: 900;
+      font-size: 14px;
+      line-height: 1.1;
+      -webkit-appearance:none;
+      box-shadow: 0 0.5px 0 rgba(0,0,0,.08) inset;
+      white-space: nowrap;
+    }
+    .preset-item:active{
+      transform: scale(.99);
+      background: var(--ios-btn-press);
+    }
+    .preset-sub{
+      display:block;
+      margin-top: 4px;
+      font-weight: 800;
+      font-size: 12px;
+      color: var(--ios-sub);
+      letter-spacing: .2px;
+    }
+    .preset-close{
+      width:100%;
+      border:none;
+      border-radius: 12px;
+      padding: 12px 14px;
+      font-weight: 900;
+      font-size: 16px;
+      -webkit-appearance:none;
+      background: transparent;
+      color: var(--ios-blue);
+    }
+    .preset-close:active{ background: rgba(0,122,255,.12); }
+
+    .hidden{ display:none !important; }
+  </style>
+</head>
+
+<body class="locked">
+
+  <div class="preview-row">
+    <div class="visualizer-container" id="svg-container">
+      <svg id="vector-preview" width="100%" height="100%">
+        <defs><linearGradient id="previewGradient"></linearGradient></defs>
+        <rect id="vector-rect" rx="10" fill="url(#previewGradient)"></rect>
+      </svg>
+    </div>
+  </div>
+
+  <!-- (2) Removed the "RESOLUTION" label row; keeping just the inputs + toolbar -->
+  <div class="section">
+    <div class="input-row">
+      <div class="input-col">
+        <!-- (3) W -> Width -->
+        <div class="sub-label">Width</div>
+        <input type="number" id="resW" value="3840" inputmode="numeric" pattern="\d*">
+      </div>
+
+      <span class="separator">x</span>
+
+      <div class="input-col">
+        <!-- (3) H -> Height -->
+        <div class="sub-label">Height</div>
+        <input type="number" id="resH" value="2160" inputmode="numeric" pattern="\d*">
+      </div>
+    </div>
+
+    <div class="res-toolbar" role="toolbar" aria-label="Resolution tools">
+      <!-- Presets -->
+      <button class="tb-btn" id="tbPresets" type="button" aria-label="Resolution presets">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="64" height="64" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="3" width="18" height="18" rx="4" />
+          <path d="M9 3v18" />
+          <path d="M15 3v18" />
+          <path d="M3 9h18" />
+          <path d="M3 15h18" />
+        </svg>
+      </button>
+
+      <!-- Angle -->
+      <button class="tb-btn" id="tbAngle" type="button" aria-label="Angle presets">
+        <div id="tbAngleRotator" class="tb-angle-rotator" aria-hidden="true">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+            <circle cx="50" cy="50" r="40" fill="transparent" stroke="currentColor" stroke-width="6" />
+            <line x1="50" y1="50" x2="50" y2="10" stroke="currentColor" stroke-width="6" stroke-linecap="round" />
+            <circle cx="50" cy="50" r="6" fill="currentColor" />
+          </svg>
+        </div>
+      </button>
+
+      <!-- Swap -->
+      <button class="tb-btn" id="tbSwap" type="button" aria-label="Swap width and height">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M4 7h16" />
+          <path d="M16 3l4 4-4 4" />
+          <path d="M20 17H4" />
+          <path d="M8 13l-4 4 4 4" />
+        </svg>
+      </button>
+
+      <!-- x2 TOGGLE -->
+      <button class="tb-btn" id="tbX2" type="button" aria-label="Toggle x2 scale">
+        <span class="tb-text">x2</span>
+      </button>
+
+      <!-- x3 TOGGLE -->
+      <button class="tb-btn" id="tbX3" type="button" aria-label="Toggle x3 scale">
+        <span class="tb-text">x3</span>
+      </button>
+    </div>
+  </div>
+
+  <input class="hidden" type="number" id="angleDeg" value="0">
+
+  <div class="section panel">
+    <div class="colors-header">
+      <div class="colors-header-left">
+        <div class="colors-title">Colors</div>
+        <button class="info-btn" id="infoBtn" type="button" aria-label="Color input help">?⃝</button>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn-alt" id="minusBtn" type="button">−</button>
+        <button class="btn-alt" id="plusBtn" type="button">+</button>
+      </div>
+    </div>
+
+    <div class="colors-list" id="colorsList"></div>
+  </div>
+
+  <div class="footer">
+    <button class="btn" id="generateBtn" type="button" style="width:100%; padding:14px 16px; font-size:18px;">
+      Generate Gradient
+    </button>
+    <div class="status" id="status"></div>
+  </div>
+
+  <canvas id="renderCanvas"></canvas>
+
+  <div class="modal-backdrop" id="modalBackdrop" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <div class="modal-card">
+      <div class="modal-title" id="modalTitle">Color Input Help</div>
+      <div class="modal-text">
+        You can enter colors in any of these formats:
+        <ul style="margin:10px 0 0 18px; padding:0;">
+          <li><b>Hex</b>: <code>#ff2462</code> or <code>ff2462</code></li>
+          <li><b>RGB</b>: <code>255 36 98</code> or <code>255,36,98</code></li>
+          <li><b>Named</b> (CSS color names): <code>white</code>, <code>blue</code>, <code>hotpink</code>, etc.</li>
+        </ul>
+        <div style="margin-top:10px;">Tip: The picker button sets the field to hex automatically.</div>
+      </div>
+      <button class="modal-close" id="modalCloseBtn" type="button">Close</button>
+    </div>
+  </div>
+
+  <!-- Angle popup modal -->
+  <div class="deg-backdrop" id="degBackdrop" role="dialog" aria-modal="true" aria-labelledby="degTitle">
+    <div class="deg-card">
+      <div class="deg-sheet">
+        <div class="deg-title" id="degTitle">Angle Presets</div>
+
+        <div class="deg-big-wrap" aria-hidden="true">
+          <div id="degBigRotator" class="deg-big-rotator">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+              <circle cx="50" cy="50" r="40" fill="transparent" stroke="#8e8e93" stroke-width="6" />
+              <line x1="50" y1="50" x2="50" y2="10" stroke="#8e8e93" stroke-width="6" stroke-linecap="round" />
+              <circle cx="50" cy="50" r="6" fill="#8e8e93" />
+            </svg>
+          </div>
+        </div>
+
+        <div class="deg-angle-row">
+          <input id="degAngleInput" class="deg-angle-input" type="text" inputmode="numeric" value="0" aria-label="Angle in degrees">
+        </div>
+
+        <div class="preset-row">
+          <button class="preset-btn" type="button" data-deg="0">0°</button>
+          <button class="preset-btn" type="button" data-deg="45">45°</button>
+          <button class="preset-btn" type="button" data-deg="90">90°</button>
+          <button class="preset-btn" type="button" data-deg="135">135°</button>
+          <button class="preset-btn" type="button" data-deg="180">180°</button>
+        </div>
+
+        <div class="preset-row" style="margin-bottom:0;">
+          <button class="preset-btn" type="button" id="btnHInvert" aria-label="Flip horizontally"></button>
+          <button class="preset-btn" type="button" id="btnVInvert" aria-label="Flip vertically"></button>
+        </div>
+
+        <div class="deg-divider"></div>
+
+        <button class="deg-close" id="degCloseBtn" type="button">Done</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Presets popup modal -->
+  <div class="preset-backdrop" id="presetBackdrop" role="dialog" aria-modal="true" aria-labelledby="presetTitle">
+    <div class="preset-card">
+      <div class="preset-sheet">
+        <div class="preset-title" id="presetTitle">Resolution Presets</div>
+
+        <div class="preset-grid" id="presetGrid"></div>
+
+        <button class="preset-close" id="presetCloseBtn" type="button">Done</button>
+      </div>
+    </div>
+  </div>
+
+<script>
+  let preventTouchMove = (e) => e.preventDefault();
+
+  function setScrollLock(locked){
+    const html = document.documentElement;
+    const body = document.body;
+
+    html.classList.remove('locked','scrollable');
+    body.classList.remove('locked','scrollable');
+
+    if (locked){
+      html.classList.add('locked');
+      body.classList.add('locked');
+      document.addEventListener('touchmove', preventTouchMove, { passive:false });
+    } else {
+      html.classList.add('scrollable');
+      body.classList.add('scrollable');
+      document.removeEventListener('touchmove', preventTouchMove, { passive:false });
+    }
+  }
+
+  const resW = document.getElementById('resW');
+  const resH = document.getElementById('resH');
+  const angleDegInput = document.getElementById('angleDeg');
+
+  // Toolbar
+  const tbPresets = document.getElementById('tbPresets');
+  const tbAngle   = document.getElementById('tbAngle');
+  const tbSwap    = document.getElementById('tbSwap');
+  const tbX2      = document.getElementById('tbX2');
+  const tbX3      = document.getElementById('tbX3');
+  const tbAngleRotator = document.getElementById('tbAngleRotator');
+
+  // Toggle state for x2/x3
+  let scaleMode = 1;                 // 1, 2, or 3
+  let baseW = null, baseH = null;    // remembers the "unscaled" values
+
+  function readIntOr0(v){ const n = parseInt(String(v||'').trim(), 10); return Number.isFinite(n) ? n : 0; }
+  function clampRes(n){ return Math.max(1, (n|0)); } // no max cap
+
+  function clearScaleSelection(){
+    scaleMode = 1;
+    baseW = null; baseH = null;
+    tbX2.classList.remove('tb-toggle-selected');
+    tbX3.classList.remove('tb-toggle-selected');
+  }
+
+  function applyScaleToInputs(){
+    if (baseW === null || baseH === null){
+      baseW = readIntOr0(resW.value);
+      baseH = readIntOr0(resH.value);
+    }
+    const w = clampRes(baseW * scaleMode);
+    const h = clampRes(baseH * scaleMode);
+    resW.value = String(w);
+    resH.value = String(h);
+  }
+
+  function setScaleMode(newMode){
+    scaleMode = newMode;
+
+    tbX2.classList.toggle('tb-toggle-selected', scaleMode === 2);
+    tbX3.classList.toggle('tb-toggle-selected', scaleMode === 3);
+
+    if (scaleMode === 1){
+      if (baseW !== null && baseH !== null){
+        resW.value = String(baseW);
+        resH.value = String(baseH);
+      }
+      baseW = null; baseH = null;
+    } else {
+      applyScaleToInputs();
+    }
+
+    updatePreviewGradient();
+  }
+
+  function onUserManualResolutionEdit(){
+    if (scaleMode !== 1){
+      const w = readIntOr0(resW.value);
+      const h = readIntOr0(resH.value);
+      baseW = Math.round(w / scaleMode);
+      baseH = Math.round(h / scaleMode);
+      applyScaleToInputs();
+    } else {
+      baseW = null; baseH = null;
+    }
+  }
+
+  // Modals
+  const presetBackdrop = document.getElementById('presetBackdrop');
+  const presetCloseBtn = document.getElementById('presetCloseBtn');
+  const presetGrid     = document.getElementById('presetGrid');
+
+  const degBackdrop = document.getElementById('degBackdrop');
+  const degCloseBtn = document.getElementById('degCloseBtn');
+  const degBigRotator = document.getElementById('degBigRotator');
+  const degAngleInput = document.getElementById('degAngleInput');
+  const btnHInvert = document.getElementById('btnHInvert');
+  const btnVInvert = document.getElementById('btnVInvert');
+
+  const svgContainer = document.getElementById('svg-container');
+  const vectorRect = document.getElementById('vector-rect');
+  const gradEl = document.getElementById('previewGradient');
+
+  const colorsList = document.getElementById('colorsList');
+  const minusBtn = document.getElementById('minusBtn');
+  const plusBtn  = document.getElementById('plusBtn');
+  const generateBtn = document.getElementById('generateBtn');
+  const statusEl = document.getElementById('status');
+
+  const infoBtn = document.getElementById('infoBtn');
+  const modalBackdrop = document.getElementById('modalBackdrop');
+  const modalCloseBtn = document.getElementById('modalCloseBtn');
+
+  const canvas = document.getElementById('renderCanvas');
+  const ctx = canvas.getContext('2d', { willReadFrequently:false });
+
+  let colorCount = 2;
+  const DITHER_AMPLITUDE = 0.5;
+
+  function openModal(){ modalBackdrop.classList.add('show'); }
+  function closeModal(){ modalBackdrop.classList.remove('show'); }
+  infoBtn.addEventListener('click', openModal);
+  modalCloseBtn.addEventListener('click', closeModal);
+  modalBackdrop.addEventListener('click', (e) => { if (e.target === modalBackdrop) closeModal(); });
+
+  function normalizeAngleDeg(raw){
+    let a = Number(raw);
+    if (!Number.isFinite(a)) a = 0;
+    if (a === 360 || a === -360) return 0;
+    a = a % 360;
+    if (a === 0) return 0;
+    a = Math.trunc(a);
+    if (a > 359) a = 359;
+    if (a < -359) a = -359;
+    return a;
+  }
+
+  function updateToolbarAngleRotation(deg){
+    if (tbAngleRotator) tbAngleRotator.style.transform = `rotate(${deg}deg)`;
+  }
+
+  function stripDegreeSuffix(s){
+    return String(s || '').trim().replace(/°/g,'').trim();
+  }
+  function setPopupAngleText(deg, withDegree){
+    const a = normalizeAngleDeg(deg);
+    degAngleInput.value = withDegree ? `${a}°` : `${a}`;
+  }
+  function readPopupAngleNumeric(){
+    return normalizeAngleDeg(stripDegreeSuffix(degAngleInput.value));
+  }
+
+  function updateDegreeBigRotation(deg){
+    if (degBigRotator) degBigRotator.style.transform = `rotate(${deg}deg)`;
+  }
+
+  function setAngleDeg(deg){
+    const a = normalizeAngleDeg(deg);
+    angleDegInput.value = String(a);
+    setPopupAngleText(a, true);
+    updatePreviewGradient();
+    updateDegreeBigRotation(a);
+    updateToolbarAngleRotation(a);
+  }
+
+  function openDegModal(){
+    degBackdrop.classList.add('show');
+    const a = normalizeAngleDeg(angleDegInput.value);
+    setPopupAngleText(a, true);
+    updateDegreeBigRotation(a);
+    setTimeout(() => { try { document.activeElement && document.activeElement.blur(); } catch(_){} }, 0);
+  }
+  function closeDegModal(){
+    const a = readPopupAngleNumeric();
+    setAngleDeg(a);
+    degBackdrop.classList.remove('show');
+  }
+
+  degAngleInput.addEventListener('focus', () => {
+    const a = readPopupAngleNumeric();
+    setPopupAngleText(a, false);
+  });
+  degAngleInput.addEventListener('input', () => {
+    const a = readPopupAngleNumeric();
+    angleDegInput.value = String(a);
+    updatePreviewGradient();
+    updateDegreeBigRotation(a);
+    updateToolbarAngleRotation(a);
+  });
+  degAngleInput.addEventListener('blur', () => {
+    const a = readPopupAngleNumeric();
+    setAngleDeg(a);
+  });
+
+  degBackdrop.querySelectorAll('.preset-btn[data-deg]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const deg = parseInt(btn.getAttribute('data-deg'), 10) || 0;
+      setAngleDeg(deg);
+      try { degAngleInput.blur(); } catch(_) {}
+    });
+  });
+
+  btnHInvert.addEventListener('click', () => {
+    const cur = readPopupAngleNumeric();
+    setAngleDeg(-cur);
+    try { degAngleInput.blur(); } catch(_) {}
+  });
+
+  btnVInvert.addEventListener('click', () => {
+    const cur = readPopupAngleNumeric();
+    setAngleDeg(180 - cur);
+    try { degAngleInput.blur(); } catch(_) {}
+  });
+
+  degCloseBtn.addEventListener('click', closeDegModal);
+  degBackdrop.addEventListener('click', (e) => { if (e.target === degBackdrop) closeDegModal(); });
+
+  tbAngle.addEventListener('click', openDegModal);
+
+  // ===== Resolution Presets (your requested grid order) =====
+  const RES_PRESETS = [
+    { w: 1920, h: 1080, label: "1920×1080", sub: "1080p / 16:9" },
+    { w: 3840, h: 2160, label: "3840×2160", sub: "4K / 16:9" },
+    { w: 1170, h: 2532, label: "1170×2532", sub: "iPhone 13 Pro" },
+    { w: 1620, h: 2160, label: "1620×2160", sub: "iPad 9th Gen" },
+    { w: 2048, h: 2048, label: "2048×2048", sub: "Icon (XL) / 1:1" },
+    { w: 1024, h: 1024, label: "1024×1024", sub: "Icon (L) / 1:1" },
+  ];
+
+  function openPresetModal(){
+    presetBackdrop.classList.add('show');
+    setTimeout(() => { try { document.activeElement && document.activeElement.blur(); } catch(_){} }, 0);
+  }
+  function closePresetModal(){ presetBackdrop.classList.remove('show'); }
+
+  function buildPresetGrid(){
+    presetGrid.innerHTML = '';
+    for (const p of RES_PRESETS){
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'preset-item';
+      btn.innerHTML = `${p.label}<span class="preset-sub">${p.sub}</span>`;
+      btn.addEventListener('click', () => {
+        clearScaleSelection();
+        resW.value = String(p.w);
+        resH.value = String(p.h);
+        updatePreviewGradient();
+        closePresetModal();
+      });
+      presetGrid.appendChild(btn);
+    }
+  }
+
+  tbPresets.addEventListener('click', openPresetModal);
+  presetCloseBtn.addEventListener('click', closePresetModal);
+  presetBackdrop.addEventListener('click', (e) => { if (e.target === presetBackdrop) closePresetModal(); });
+
+  tbSwap.addEventListener('click', () => {
+    if (scaleMode !== 1 && baseW !== null && baseH !== null){
+      const t = baseW; baseW = baseH; baseH = t;
+      applyScaleToInputs();
+    } else {
+      const w = resW.value, h = resH.value;
+      resW.value = h; resH.value = w;
+    }
+    updatePreviewGradient();
+  });
+
+  tbX2.addEventListener('click', () => { (scaleMode === 2) ? setScaleMode(1) : setScaleMode(2); });
+  tbX3.addEventListener('click', () => { (scaleMode === 3) ? setScaleMode(1) : setScaleMode(3); });
+
+  resW.addEventListener('input', () => { onUserManualResolutionEdit(); updatePreviewGradient(); });
+  resH.addEventListener('input', () => { onUserManualResolutionEdit(); updatePreviewGradient(); });
+
+  // ---------- (1) "Ghost text" clear-on-type behavior ----------
+  // Behavior:
+  // - On focus: if field has content and isn't already in ghost mode:
+  //     keep the content, but tint it grey
+  // - On first real typing (printable key / paste / delete/backspace):
+  //     clear the field and replace with user's input
+  // - If user blurs without typing:
+  //     restore original color (and keep the original text)
+  function attachGhostClearBehavior(inputEl){
+    if (!inputEl || inputEl.dataset.ghostInit === '1') return;
+    inputEl.dataset.ghostInit = '1';
+
+    const setGrey = () => { inputEl.style.color = 'var(--ios-sub)'; };
+    const setNormal = () => { inputEl.style.color = ''; };
+
+    inputEl.addEventListener('focus', () => {
+      // do not enter ghost mode if empty
+      if (!inputEl.value) return;
+
+      // mark as ghosting (text visible but grey)
+      inputEl.dataset.ghosting = '1';
+      inputEl.dataset.ghostValue = inputEl.value;
+      setGrey();
+
+      // optional: place caret at end (iOS can be inconsistent; harmless)
+      try { inputEl.setSelectionRange(inputEl.value.length, inputEl.value.length); } catch(_) {}
+    });
+
+    inputEl.addEventListener('blur', () => {
+      if (inputEl.dataset.ghosting === '1'){
+        // user never typed; revert to normal color
+        setNormal();
+        delete inputEl.dataset.ghosting;
+        delete inputEl.dataset.ghostValue;
+      }
+    });
+
+    inputEl.addEventListener('keydown', (e) => {
+      if (inputEl.dataset.ghosting !== '1') return;
+
+      const isPrintable =
+        e.key && e.key.length === 1 &&
+        !e.ctrlKey && !e.metaKey && !e.altKey;
+
+      // If they hit backspace/delete as first action, just clear.
+      if (e.key === 'Backspace' || e.key === 'Delete'){
+        e.preventDefault();
+        inputEl.value = '';
+        setNormal();
+        delete inputEl.dataset.ghosting;
+        delete inputEl.dataset.ghostValue;
+        return;
+      }
+
+      if (isPrintable){
+        // replace ghost text with the very first typed character
+        e.preventDefault();
+        inputEl.value = e.key;
+        setNormal();
+        delete inputEl.dataset.ghosting;
+        delete inputEl.dataset.ghostValue;
+
+        // trigger any listeners that rely on input events
+        inputEl.dispatchEvent(new Event('input', { bubbles:true }));
+        return;
+      }
+    });
+
+    inputEl.addEventListener('paste', (e) => {
+      if (inputEl.dataset.ghosting !== '1') return;
+      e.preventDefault();
+
+      const text = (e.clipboardData || window.clipboardData).getData('text') || '';
+      inputEl.value = text;
+      setNormal();
+      delete inputEl.dataset.ghosting;
+      delete inputEl.dataset.ghostValue;
+
+      inputEl.dispatchEvent(new Event('input', { bubbles:true }));
+    });
+  }
+
+  // ---------- Color parsing helpers ----------
+  function cssColorIsValid(s){
+    const el = document.createElement('div');
+    el.style.color = '';
+    el.style.color = s;
+    return !!el.style.color;
+  }
+  function normalizeColorInput(raw){
+    const s = (raw || '').trim();
+    if (!s) return null;
+
+    const m = s.match(/^(\d{1,3})\s*[, ]\s*(\d{1,3})\s*[, ]\s*(\d{1,3})$/);
+    if (m) {
+      const r = Math.max(0, Math.min(255, parseInt(m[1],10)));
+      const g = Math.max(0, Math.min(255, parseInt(m[2],10)));
+      const b = Math.max(0, Math.min(255, parseInt(m[3],10)));
+      return `rgb(${r}, ${g}, ${b})`;
+    }
+    if (/^[0-9a-fA-F]{6}$/.test(s)) return '#' + s;
+    return s;
+  }
+  function stopLabel(i,n){
+    if (n===2) return i===0 ? "Top" : "Bottom";
+    if (n===3) return i===0 ? "Top" : (i===1 ? "Middle" : "Bottom");
+    if (i===0) return "Color 1 (Top)";
+    if (i===n-1) return `Color ${n} (Bottom)`;
+    return `Color ${i+1}`;
+  }
+  function parseToRGB255(norm){
+    const t = document.createElement('canvas');
+    t.width=1; t.height=1;
+    const c = t.getContext('2d');
+    c.clearRect(0,0,1,1);
+    c.fillStyle = '#000';
+    c.fillStyle = norm;
+    c.fillRect(0,0,1,1);
+    const d = c.getImageData(0,0,1,1).data;
+    return [d[0], d[1], d[2]];
+  }
+
+  function clampU8(v){ return v<0?0 : v>255?255 : (v|0); }
+  function lerp(a,b,t){ return a+(b-a)*t; }
+  function randomSigned(){ return (Math.random()*2)-1; }
+
+  function updateVectorAspect(){
+    const w = parseFloat(resW.value)||1;
+    const h = parseFloat(resH.value)||1;
+    const cw = svgContainer.clientWidth;
+    const ch = svgContainer.clientHeight;
+
+    const scale = 0.82;
+    const maxW = cw*scale, maxH = ch*scale;
+
+    let rw = maxW;
+    let rh = (maxW / w) * h;
+    if (rh > maxH) { rh = maxH; rw = (maxH / h) * w; }
+
+    vectorRect.setAttribute('x', (cw-rw)/2);
+    vectorRect.setAttribute('y', (ch-rh)/2);
+    vectorRect.setAttribute('width', rw);
+    vectorRect.setAttribute('height', rh);
+  }
+
+  function gradientEndpointsFromAngleDeg(deg){
+    const rad = deg * Math.PI / 180;
+    const dx = -Math.sin(rad);
+    const dy =  Math.cos(rad);
+    const cx=0.5, cy=0.5;
+    const sx = (dx===0)?Infinity:0.5/Math.abs(dx);
+    const sy = (dy===0)?Infinity:0.5/Math.abs(dy);
+    const s = Math.min(sx, sy);
+    return { x1: cx-dx*s, y1: cy-dy*s, x2: cx+dx*s, y2: cy+dy*s };
+  }
+
+  function getColorValuesForPreview(){
+    const inputs = Array.from(colorsList.querySelectorAll('input.color-text'));
+    const out = [];
+    for (const inp of inputs){
+      const norm = normalizeColorInput(inp.value);
+      if (!norm || !cssColorIsValid(norm)) return null;
+      out.push(norm);
+    }
+    return out;
+  }
+
+  function updatePreviewGradient(){
+    updateVectorAspect();
+    const deg = normalizeAngleDeg(angleDegInput.value);
+
+    gradEl.innerHTML = '';
+    const cols = getColorValuesForPreview();
+
+    const ep = gradientEndpointsFromAngleDeg(deg);
+    gradEl.setAttribute('gradientUnits','objectBoundingBox');
+    gradEl.setAttribute('x1', ep.x1);
+    gradEl.setAttribute('y1', ep.y1);
+    gradEl.setAttribute('x2', ep.x2);
+    gradEl.setAttribute('y2', ep.y2);
+
+    if (!cols || cols.length < 2) {
+      const s0 = document.createElementNS('http://www.w3.org/2000/svg','stop');
+      s0.setAttribute('offset','0%'); s0.setAttribute('stop-color','#808080');
+      const s1 = document.createElementNS('http://www.w3.org/2000/svg','stop');
+      s1.setAttribute('offset','100%'); s1.setAttribute('stop-color','#808080');
+      gradEl.appendChild(s0); gradEl.appendChild(s1);
+      return;
+    }
+
+    const n = cols.length;
+    for (let i=0;i<n;i++){
+      const stop = document.createElementNS('http://www.w3.org/2000/svg','stop');
+      stop.setAttribute('offset', ((i/(n-1))*100).toFixed(4)+'%');
+      stop.setAttribute('stop-color', cols[i]);
+      gradEl.appendChild(stop);
+    }
+  }
+
+  function computeStopPositions(n){
+    if (n===1) return [0];
+    const out=[];
+    for (let i=0;i<n;i++) out.push(i/(n-1));
+    return out;
+  }
+  function findSegmentIndex(t, pos){
+    if (t<=pos[0]) return 0;
+    const last = pos.length-1;
+    if (t>=pos[last]) return last-1;
+    for (let i=0;i<last;i++) if (t>=pos[i] && t<=pos[i+1]) return i;
+    return last-1;
+  }
+
+  // ===== Progress button UX =====
+  const GEN_BTN_ORIG_BG = generateBtn.style.background || '';
+  const GEN_BTN_ORIG_COLOR = generateBtn.style.color || '';
+  const GEN_BTN_ORIG_TEXT = generateBtn.textContent;
+
+  function setGenerateButtonProgress(pct){
+    const p = Math.max(0, Math.min(100, Math.round(pct)));
+    generateBtn.disabled = true;
+    generateBtn.style.background = `linear-gradient(to right, rgba(37,99,235,1) ${p}%, rgba(226,232,240,1) ${p}%)`;
+    generateBtn.style.color = '#ffffff';
+    generateBtn.style.position = 'relative';
+    generateBtn.style.overflow = 'hidden';
+    generateBtn.textContent = `Generating… ${p}%`;
+  }
+
+  function restoreGenerateButtonDefault(){
+    generateBtn.disabled = false;
+    generateBtn.style.background = GEN_BTN_ORIG_BG;
+    generateBtn.style.color = GEN_BTN_ORIG_COLOR;
+    generateBtn.style.display = '';
+    generateBtn.style.alignItems = '';
+    generateBtn.style.justifyContent = '';
+    generateBtn.style.gap = '';
+    generateBtn.style.position = '';
+    generateBtn.style.overflow = '';
+    generateBtn.textContent = GEN_BTN_ORIG_TEXT;
+    generateBtn.innerHTML = 'Generate Gradient';
+  }
+
+  // Save Gradient (second tap) state
+  const SAVE_ICON_SVG = `
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 2048 2048" aria-hidden="true" focusable="false"
+         style="width:22px;height:22px;display:block;fill:currentColor;">
+      <path d="M1505.91 635.02H1247.7v188.83h258.21c16.02 0 26.84 7.45 33.09 13.71c6.25 6.25 13.71 17.07 13.71 33.09v828.44c0 16.02-7.45 26.84-13.71 33.09c-6.25 6.25-17.07 13.71-33.09 13.71H542.09c-16.02 0-26.84-7.45-33.09-13.71c-6.25-6.25-13.71-17.07-13.71-33.09V870.65c0-16.02 7.45-26.84 13.71-33.09c6.25-6.25 17.07-13.71 33.09-13.71h258.85V635.02H542.09c-130.13 0-235.63 105.49-235.63 235.63v828.44c0 130.13 105.49 235.63 235.63 235.63h963.83c130.13 0 235.63-105.49 235.63-235.63V870.65C1741.54 740.51 1636.05 635.02 1505.91 635.02z"/>
+      <path d="M1297.25 938.44l-243.34 254.17c-13.85 13.85-36.31 13.85-50.16 0L750.75 938.45" fill="none" stroke="currentColor" stroke-width="135" stroke-linecap="round"/>
+      <line x1="1028.82" y1="178.42" x2="1028.82" y2="1147.78" fill="none" stroke="currentColor" stroke-width="159" stroke-linecap="round"/>
+    </svg>
+  `;
+
+  function setGenerateButtonSaveMode(){
+    generateBtn.disabled = false;
+    generateBtn.style.background = '#22c55e';   // green
+    generateBtn.style.color = '#ffffff';
+    generateBtn.style.display = 'flex';
+    generateBtn.style.alignItems = 'center';
+    generateBtn.style.justifyContent = 'center';
+    generateBtn.style.gap = '0';
+    generateBtn.style.position = 'relative';
+
+    // Centered text + right-aligned icon
+    generateBtn.innerHTML = `
+      <span style="position:absolute;left:50%;transform:translateX(-50%);font-weight:900;">Save Gradient</span>
+      <span style="margin-left:auto;display:flex;align-items:center;color:currentColor;">${SAVE_ICON_SVG}</span>
+    `;
+  }
+
+  // ---------- File/share helpers ----------
+  function getNextFilename(){
+    const key='gradient_counter_v9';
+    const n = parseInt(localStorage.getItem(key)||'0',10)+1;
+    localStorage.setItem(key,String(n));
+    return `Gradient (${n}).png`;
+  }
+
+  async function canvasToPngBlob(){
+    const blob = await new Promise(res => canvas.toBlob(res,'image/png'));
+    if (!blob) throw new Error('Failed to export PNG.');
+    return blob;
+  }
+
+  function isShareGestureError(err){
+    const name = String(err && err.name || '');
+    const msg  = String(err && err.message || err || '');
+    return (
+      name === 'NotAllowedError' ||
+      name === 'SecurityError' ||
+      msg.includes('not allowed') ||
+      msg.includes('denied permission')
+    );
+  }
+
+  async function tryShareOrDownload(blob, filename){
+    const file = new File([blob], filename, { type:'image/png' });
+
+    if (navigator.canShare && navigator.canShare({ files:[file] })) {
+      await navigator.share({ files:[file], title: filename });
+      return `Share sheet opened: ${filename}`;
+    }
+
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(()=>URL.revokeObjectURL(url), 1000);
+    return `Downloaded: ${filename}`;
+  }
+
+  // Pending second-tap share state
+  let pendingShare = null; // { blob, filename }
+
+  async function doShareNow(){
+    if (!pendingShare) return;
+    const { blob, filename } = pendingShare;
+    pendingShare = null;
+    const msg = await tryShareOrDownload(blob, filename);
+    statusEl.textContent = msg;
+    restoreGenerateButtonDefault();
+  }
+
+  // ---------- Gradient render (chunked for progress UI) ----------
+  async function renderGradientToCanvasWithProgress(width, height, rgbStops, angleDeg, onProgress){
+    canvas.width = width;
+    canvas.height = height;
+
+    const n = rgbStops.length;
+    if (n === 1) {
+      ctx.fillStyle = `rgb(${rgbStops[0][0]},${rgbStops[0][1]},${rgbStops[0][2]})`;
+      ctx.fillRect(0,0,width,height);
+      onProgress && onProgress(100);
+      return;
+    }
+
+    const img = ctx.createImageData(width, height);
+    const data = img.data;
+
+    const rad = angleDeg * Math.PI / 180;
+    const ax = -Math.sin(rad);
+    const ay =  Math.cos(rad);
+
+    const aspect = width/height;
+    const corners = [
+      [-0.5*aspect, -0.5],
+      [ 0.5*aspect, -0.5],
+      [-0.5*aspect,  0.5],
+      [ 0.5*aspect,  0.5],
+    ];
+    let extent = 0;
+    for (const [cx,cy] of corners) extent = Math.max(extent, Math.abs(cx*ax + cy*ay));
+    if (extent === 0) extent = 1;
+
+    const positions = computeStopPositions(n);
+
+    // Chunk rows to keep UI responsive + allow progress updates
+    const rowsPerChunk = Math.max(1, Math.floor(height / 120)); // ~120 updates max
+    let y = 0;
+
+    while (y < height){
+      const yEnd = Math.min(height, y + rowsPerChunk);
+
+      for (let yy=y; yy<yEnd; yy++){
+        const ny = (yy/(height-1)) - 0.5;
+
+        for (let x=0;x<width;x++){
+          const nx = ((x/(width-1)) - 0.5) * aspect;
+          let t = (nx*ax + ny*ay) / (2*extent) + 0.5;
+          if (t<0) t=0; if (t>1) t=1;
+
+          const si = findSegmentIndex(t, positions);
+          const t0 = positions[si], t1 = positions[si+1];
+          const lt = (t1===t0)?0:((t-t0)/(t1-t0));
+
+          const c0 = rgbStops[si], c1 = rgbStops[si+1];
+
+          let r = lerp(c0[0], c1[0], lt);
+          let g = lerp(c0[1], c1[1], lt);
+          let b = lerp(c0[2], c1[2], lt);
+
+          if (DITHER_AMPLITUDE>0){
+            r += randomSigned()*DITHER_AMPLITUDE;
+            g += randomSigned()*DITHER_AMPLITUDE;
+            b += randomSigned()*DITHER_AMPLITUDE;
+          }
+
+          const idx = (yy*width + x)*4;
+          data[idx+0] = clampU8(Math.round(r));
+          data[idx+1] = clampU8(Math.round(g));
+          data[idx+2] = clampU8(Math.round(b));
+          data[idx+3] = 255;
+        }
+      }
+
+      y = yEnd;
+      const pct = (y / height) * 100;
+      onProgress && onProgress(pct);
+
+      // Let UI paint
+      await new Promise(requestAnimationFrame);
+    }
+
+    ctx.putImageData(img, 0, 0);
+    onProgress && onProgress(100);
+  }
+
+  // ---------- Generate ----------
+  async function generateGradient(){
+    // If we're in "Save Gradient" mode, the button tap should try share immediately.
+    if (pendingShare){
+      try{
+        await doShareNow();
+      } catch(err){
+        statusEl.textContent = String(err.message || err);
+        // If share still fails, keep Save mode so user can retry
+        pendingShare = pendingShare || null;
+        if (pendingShare) setGenerateButtonSaveMode();
+      }
+      return;
+    }
+
+    statusEl.textContent='';
+    const w = parseInt(resW.value,10)||0;
+    const h = parseInt(resH.value,10)||0;
+    if (w<=0 || h<=0) { statusEl.textContent='Enter a valid width and height.'; return; }
+
+    const colsNorm = getColorValuesForPreview();
+    if (!colsNorm || colsNorm.length<2) { statusEl.textContent='One or more colors are invalid.'; return; }
+
+    const angleDeg = normalizeAngleDeg(angleDegInput.value);
+    const rgbStops = colsNorm.map(parseToRGB255);
+
+    try{
+      setGenerateButtonProgress(0);
+      await renderGradientToCanvasWithProgress(w,h,rgbStops,angleDeg,(p)=>setGenerateButtonProgress(p));
+
+      // At 100%, attempt share immediately
+      const filename = getNextFilename();
+      const blob = await canvasToPngBlob();
+
+      try{
+        const msg = await tryShareOrDownload(blob, filename);
+        statusEl.textContent = msg;
+        restoreGenerateButtonDefault();
+      } catch(err){
+        if (isShareGestureError(err)){
+          // Needs a second user gesture: switch to Save Gradient mode
+          pendingShare = { blob, filename };
+          statusEl.textContent = 'Tap “Save Gradient” to open the share sheet.';
+          setGenerateButtonSaveMode();
+        } else {
+          throw err;
+        }
+      }
+    } catch(err){
+      statusEl.textContent = String(err.message || err);
+      restoreGenerateButtonDefault();
+      pendingShare = null;
+    }
+  }
+
+  // ---------- Color Inputs ----------
+  function renderColorInputs(){
+    colorsList.innerHTML='';
+    for (let i=0;i<colorCount;i++){
+      const row = document.createElement('div');
+      row.className='color-row';
+
+      const lbl = document.createElement('div');
+      lbl.className='row-label';
+      lbl.textContent = stopLabel(i,colorCount)+':';
+
+      const txt = document.createElement('input');
+      txt.className='color-text';
+      txt.type='text';
+      txt.autocapitalize='off';
+      txt.autocomplete='off';
+      txt.spellcheck=false;
+      txt.value = (colorCount===2) ? (i===0?'ff2462':'0a1bff') : '';
+
+      const wrap = document.createElement('div');
+      wrap.className='picker-wrap';
+
+      const ring = document.createElement('div');
+      ring.className='picker-ios';
+
+      const center = document.createElement('div');
+      center.className='picker-center';
+      center.style.background = '#ffffff';
+
+      const native = document.createElement('input');
+      native.className='color-native';
+      native.type='color';
+      native.value='#ffffff';
+
+      function setCenterHex(hex){ center.style.background = hex; }
+
+      function syncNativeFromText(){
+        const norm = normalizeColorInput(txt.value);
+        if (norm && cssColorIsValid(norm)) {
+          const rgb = parseToRGB255(norm);
+          const hex = '#' + rgb.map(v=>v.toString(16).padStart(2,'0')).join('');
+          native.value = hex;
+          setCenterHex(hex);
+        }
+      }
+      function syncCenterFromText(){
+        const norm = normalizeColorInput(txt.value);
+        if (norm && cssColorIsValid(norm)) {
+          const rgb = parseToRGB255(norm);
+          const hex = '#' + rgb.map(v=>v.toString(16).padStart(2,'0')).join('');
+          setCenterHex(hex);
+        }
+      }
+
+      // (1) Attach ghost-clear behavior to the text field
+      attachGhostClearBehavior(txt);
+
+      txt.addEventListener('input', () => {
+        pendingShare = null; // editing invalidates pending file
+        updatePreviewGradient();
+        syncCenterFromText();
+      });
+      syncNativeFromText();
+
+      native.addEventListener('input', () => {
+        pendingShare = null;
+        const hex = native.value.toLowerCase();
+        txt.value = hex.replace('#','');
+        // If user picked a color, ensure normal text color
+        txt.style.color = '';
+        delete txt.dataset.ghosting;
+        delete txt.dataset.ghostValue;
+
+        setCenterHex(hex);
+        updatePreviewGradient();
+      });
+
+      txt.addEventListener('blur', syncNativeFromText);
+
+      wrap.appendChild(ring);
+      wrap.appendChild(center);
+      wrap.appendChild(native);
+
+      row.appendChild(lbl);
+      row.appendChild(txt);
+      row.appendChild(wrap);
+      colorsList.appendChild(row);
+    }
+
+    setScrollLock(colorCount <= 4);
+    updatePreviewGradient();
+  }
+
+  // Color count controls
+  minusBtn.addEventListener('click', () => {
+    pendingShare = null;
+    colorCount = Math.max(2, colorCount-1);
+    renderColorInputs();
+  });
+  plusBtn.addEventListener('click',  () => {
+    pendingShare = null;
+    colorCount = Math.min(24, colorCount+1);
+    renderColorInputs();
+  });
+
+  // Generate
+  generateBtn.addEventListener('click', generateGradient);
+
+  // Keyboard escape
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape'){
+      closeModal();
+      if (degBackdrop.classList.contains('show')) closeDegModal();
+      if (presetBackdrop.classList.contains('show')) closePresetModal();
+    }
+  });
+
+  // ===== Flip icons in angle popup (fixed so triangles show) =====
+  const SVG_FLIP_VERTICAL = `
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 2048 2048"
+         aria-hidden="true" focusable="false"
+         style="width:20px;height:20px;display:block;color:currentColor;">
+      <path d="M953.03 1237.46L357.3 1886.54c-56.69 61.77-12.88 161.46 70.96 161.46h1191.47c83.84 0 127.66-99.69 70.96-161.46l-595.73-649.08C1056.79 1195.87 991.2 1195.87 953.03 1237.46z M1094.97 810.54l595.73-649.08C1747.39 99.69 1703.57 0 1619.73 0H428.27c-83.84 0-127.66 99.69-70.96 161.46l595.73 649.08C991.21 852.13 1056.79 852.13 1094.97 810.54z"
+            fill="currentColor" stroke="none" />
+      <path d="M95.7 1024h150m191.3 0h150m191.3 0h150m191.4 0h150m191.3 0h150m191.4 0h150"
+            fill="none" stroke="currentColor" stroke-width="83.4" stroke-linecap="round" />
+    </svg>
+  `;
+
+  const SVG_FLIP_HORIZONTAL = `
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 2048 2048"
+         aria-hidden="true" focusable="false"
+         style="width:20px;height:20px;display:block;color:currentColor;">
+      <path d="M810.54 953.03L161.46 357.3C99.69 300.61 0 344.43 0 428.27v1191.47c0 83.84 99.69 127.66 161.46 70.96l649.08-595.73C852.13 1056.79 852.13 991.2 810.54 953.03z M1237.46 1094.97l649.08 595.73c61.77 56.69 161.46 12.88 161.46-70.96v-1191.47c0-83.84-99.69-127.66-161.46-70.96l-649.08 595.73C1195.87 991.21 1195.87 1056.79 1237.46 1094.97z"
+            fill="currentColor" stroke="none" />
+      <path d="M1024 95.7v150m0 191.3v150m0 191.3v150m0 191.4v150m0 191.3v150m0 191.4v150"
+            fill="none" stroke="currentColor" stroke-width="83.4" stroke-linecap="round" />
+    </svg>
+  `;
+
+  btnVInvert.innerHTML = SVG_FLIP_VERTICAL;
+  btnHInvert.innerHTML = SVG_FLIP_HORIZONTAL;
+
+  // Init
+  buildPresetGrid();
+  setScrollLock(true);
+  renderColorInputs();
+  setAngleDeg(0);
+  updatePreviewGradient();
+
+  // (1) Attach ghost-clear behavior to all always-present inputs
+  attachGhostClearBehavior(resW);
+  attachGhostClearBehavior(resH);
+  attachGhostClearBehavior(degAngleInput);
+
+  // Keep preview correct on orientation/resize
+  window.addEventListener('resize', () => updatePreviewGradient());
+</script>
+</body>
+</html>
