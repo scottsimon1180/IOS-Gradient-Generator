@@ -160,11 +160,13 @@
     .picker-ios{ position:absolute; inset:0; border-radius:999px; background:conic-gradient(#ff3b30,#ff9500,#ffcc00,#34c759,#00c7be,#007aff,#5856d6,#af52de,#ff2d55,#ff3b30); display:flex; align-items:center; justify-content:center; box-shadow:none; }
     .picker-ios::before{ content:""; width:25px; height:25px; border-radius:999px; background:rgba(255,255,255,.92); box-shadow:0 0 0 .5px rgba(0,0,0,.12); }
     .picker-center{ position:absolute; left:50%; top:50%; transform:translate(-50%,-50%); width:18px; height:18px; border-radius:999px; background:#fff; box-shadow:0 0 0 1.5px rgba(255,255,255,.95), 0 0 0 .5px rgba(0,0,0,.20); }
-    input.color-native{ position:absolute; inset:0; opacity:.001; width:100%; height:100%; border:none; padding:0; margin:0; -webkit-appearance:none; background:transparent; }
+    
+    /* Updated generic target class for the custom transparent button */
+    .color-native{ position:absolute; inset:0; opacity:.001; width:100%; height:100%; border:none; padding:0; margin:0; -webkit-appearance:none; background:transparent; cursor:pointer; }
 
     .drag-handle {
       flex: 0 0 auto; width: 34px; height: 34px; display: flex; align-items: center; justify-content: center;
-      color: var(--ios-sub); cursor: grab; touch-action: none; -webkit-tap-highlight-color: transparent;
+      color: var(--ios-sub); cursor: grab; touch-action: pan-y; -webkit-tap-highlight-color: transparent;
     }
     .drag-handle:active { cursor: grabbing; color: var(--ios-text); }
     .drag-handle svg { width: 22px; height: 22px; display: block; stroke: currentColor; }
@@ -200,7 +202,6 @@
     .preset-btn:active{ transform:scale(.99); background: var(--ios-btn-press); }
     .deg-divider{ height:1px; background: var(--ios-sep); margin: 12px 0; }
     
-    /* Updated Preset Grid & Item UI */
     .preset-grid{ display:grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px; }
     @media (max-width: 440px) { .preset-grid { grid-template-columns: 1fr; } }
     
@@ -211,9 +212,7 @@
     }
     .preset-item:active{ transform: scale(.98); background: var(--ios-btn-press); }
     
-    .preset-icon {
-      flex: 0 0 auto; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; color: var(--ios-text);
-    }
+    .preset-icon { flex: 0 0 auto; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; color: var(--ios-text); }
     .preset-icon svg { width: 100%; height: 100%; display: block; }
     
     .preset-info { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
@@ -364,6 +363,8 @@
     </div>
   </div>
 
+<script src="https://scottsimon1180.github.io/IOS-Gradient-Generator/colorPicker.js"></script>
+
 <script>
   let preventTouchMove = (e) => e.preventDefault();
 
@@ -383,15 +384,10 @@
     }
   }
 
-  // Calculates total DOM height vs Viewport height to evaluate scroll constraints
   function updateDynamicScrollLock() {
     const footer = document.querySelector('.footer');
     if (!footer) return;
-    
-    // Total height = distance from top of body + height of footer + 30px body bottom padding
     const totalContentHeight = footer.offsetTop + footer.offsetHeight + 30;
-    
-    // Lock scroll exclusively if the total content fits within the visible viewport window
     setScrollLock(totalContentHeight <= window.innerHeight);
   }
 
@@ -870,46 +866,85 @@
   }
 
   function setupDragHandle(row, handle) {
+    let dragTimer = null;
+    let isDragging = false;
+    let startY = 0;
+
+    const onPointerMoveDrag = (moveEvent) => {
+      if (!isDragging) return;
+      moveEvent.preventDefault(); // Take over from native scroll
+      const currentY = moveEvent.clientY;
+      const siblings = Array.from(colorsList.querySelectorAll('.color-row:not(.is-dragging)'));
+      let targetSibling = null;
+      
+      for (const sibling of siblings) {
+        const rect = sibling.getBoundingClientRect();
+        const midPoint = rect.top + rect.height / 2;
+        if (currentY < midPoint) {
+          targetSibling = sibling;
+          break;
+        }
+      }
+      
+      if (targetSibling) {
+        colorsList.insertBefore(row, targetSibling);
+      } else {
+        colorsList.appendChild(row);
+      }
+    };
+
+    const onPointerUpDrag = () => {
+      if (!isDragging) return;
+      isDragging = false;
+      row.classList.remove('is-dragging');
+      document.removeEventListener('pointermove', onPointerMoveDrag);
+      document.removeEventListener('pointerup', onPointerUpDrag);
+      document.removeEventListener('pointercancel', onPointerUpDrag);
+      pendingShare = null;
+      updateColorLabels();
+      updatePreviewGradient();
+      updateDynamicScrollLock(); // Release the forced drag scroll lock
+    };
+
+    // Initialize Long Press
     handle.addEventListener('pointerdown', (e) => {
-      e.preventDefault();
-      row.classList.add('is-dragging');
-
-      const onPointerMove = (moveEvent) => {
-        moveEvent.preventDefault();
-        const currentY = moveEvent.clientY;
-        const siblings = Array.from(colorsList.querySelectorAll('.color-row:not(.is-dragging)'));
-        let targetSibling = null;
+      if (e.button !== 0 && e.pointerType === 'mouse') return;
+      
+      startY = e.clientY;
+      
+      dragTimer = setTimeout(() => {
+        isDragging = true;
+        dragTimer = null;
         
-        for (const sibling of siblings) {
-          const rect = sibling.getBoundingClientRect();
-          const midPoint = rect.top + rect.height / 2;
-          if (currentY < midPoint) {
-            targetSibling = sibling;
-            break;
-          }
-        }
+        if (navigator.vibrate) navigator.vibrate(40); // Haptic feedback on active
         
-        if (targetSibling) {
-          colorsList.insertBefore(row, targetSibling);
-        } else {
-          colorsList.appendChild(row);
-        }
-      };
-
-      const onPointerUp = () => {
-        row.classList.remove('is-dragging');
-        document.removeEventListener('pointermove', onPointerMove);
-        document.removeEventListener('pointerup', onPointerUp);
-        document.removeEventListener('pointercancel', onPointerUp);
-        pendingShare = null;
-        updateColorLabels();
-        updatePreviewGradient();
-      };
-
-      document.addEventListener('pointermove', onPointerMove, { passive: false });
-      document.addEventListener('pointerup', onPointerUp);
-      document.addEventListener('pointercancel', onPointerUp);
+        setScrollLock(true); // Force lock the document scroll for drag fidelity
+        row.classList.add('is-dragging');
+        
+        document.addEventListener('pointermove', onPointerMoveDrag, { passive: false });
+        document.addEventListener('pointerup', onPointerUpDrag);
+        document.addEventListener('pointercancel', onPointerUpDrag);
+      }, 350); // 350 milliseconds hold to enter rearrange mode
     });
+
+    handle.addEventListener('pointermove', (e) => {
+      // If the user moves their finger significantly before the timer pops, cancel the hold
+      if (dragTimer && Math.abs(e.clientY - startY) > 10) {
+        clearTimeout(dragTimer);
+        dragTimer = null;
+      }
+    });
+
+    handle.addEventListener('pointerup', () => {
+      if (dragTimer) { clearTimeout(dragTimer); dragTimer = null; }
+    });
+    
+    handle.addEventListener('pointercancel', () => {
+      if (dragTimer) { clearTimeout(dragTimer); dragTimer = null; }
+    });
+    
+    // Prevent text selection or long-press context menus on the handle
+    handle.addEventListener('contextmenu', e => e.preventDefault());
   }
 
   function createColorRowElement(defaultHex = ''){
@@ -919,19 +954,20 @@
     const wrap = document.createElement('div'); wrap.className = 'picker-wrap';
     const ring = document.createElement('div'); ring.className = 'picker-ios';
     const center = document.createElement('div'); center.className = 'picker-center'; center.style.background = '#ffffff';
-    const native = document.createElement('input'); native.className = 'color-native'; native.type = 'color'; native.value = '#ffffff';
     
-    // Drag Handle Structure
+    // REPLACED: Native color input removed. Created a transparent trigger button instead.
+    const customTrigger = document.createElement('button');
+    customTrigger.className = 'color-native'; 
+    customTrigger.type = 'button';
+    customTrigger.style.cursor = 'pointer';
+    
     const dragHandle = document.createElement('div');
     dragHandle.className = 'drag-handle';
-    dragHandle.setAttribute('aria-label', 'Drag to reorder');
+    dragHandle.setAttribute('aria-label', 'Press and hold to reorder');
     dragHandle.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>`;
 
     function setCenterHex(hex){ center.style.background = hex; }
-    function syncNativeFromText(){
-      const norm = normalizeColorInput(txt.value);
-      if (norm && cssColorIsValid(norm)) { const rgb = parseToRGB255(norm); const hex = '#' + rgb.map(v=>v.toString(16).padStart(2,'0')).join(''); native.value = hex; setCenterHex(hex); }
-    }
+    
     function syncCenterFromText(){
       const norm = normalizeColorInput(txt.value);
       if (norm && cssColorIsValid(norm)) { const rgb = parseToRGB255(norm); const hex = '#' + rgb.map(v=>v.toString(16).padStart(2,'0')).join(''); setCenterHex(hex); }
@@ -939,16 +975,38 @@
 
     attachGhostClearBehavior(txt);
     txt.addEventListener('input', () => { pendingShare = null; updatePreviewGradient(); syncCenterFromText(); });
-    syncNativeFromText();
+    
+    // Initialize the visual dot
+    syncCenterFromText();
 
-    native.addEventListener('input', () => {
-      pendingShare = null; const hex = native.value.toLowerCase(); txt.value = hex.replace('#','');
-      txt.style.color = ''; delete txt.dataset.ghosting; delete txt.dataset.ghostValue;
-      setCenterHex(hex); updatePreviewGradient();
+    // REPLACED: The event listener now triggers your custom IOSColorPicker
+    customTrigger.addEventListener('click', () => {
+        pendingShare = null;
+        
+        // Ensure we pass a clean hex code to the picker
+        let currentHex = txt.value.trim().replace('#', '');
+        if (currentHex === '') currentHex = 'FFFFFF';
+        
+        // Instantiate the custom picker
+        const picker = new IOSColorPicker({
+            initialColor: currentHex,
+            onChange: (newHex) => {
+                // This callback fires every time the picker updates
+                txt.value = newHex;
+                txt.style.color = ''; 
+                delete txt.dataset.ghosting; 
+                delete txt.dataset.ghostValue;
+                setCenterHex('#' + newHex);
+                updatePreviewGradient();
+            }
+        });
+        
+        picker.open();
     });
-    txt.addEventListener('blur', syncNativeFromText);
 
-    wrap.appendChild(ring); wrap.appendChild(center); wrap.appendChild(native);
+    txt.addEventListener('blur', syncCenterFromText);
+
+    wrap.appendChild(ring); wrap.appendChild(center); wrap.appendChild(customTrigger);
     row.appendChild(lbl); row.appendChild(txt); row.appendChild(wrap); row.appendChild(dragHandle);
     
     setupDragHandle(row, dragHandle);
@@ -989,18 +1047,16 @@
   syncColorRows(); 
   setAngleDeg(0);
   updatePreviewGradient();
-  updateDynamicScrollLock(); // Enforces logical geometry constraints on load
+  updateDynamicScrollLock(); 
 
   attachGhostClearBehavior(resW);
   attachGhostClearBehavior(resH);
   attachGhostClearBehavior(degAngleInput);
   
-  // Re-evaluates dimensional geometry upon window resize
   window.addEventListener('resize', () => { 
     updatePreviewGradient(); 
     updateDynamicScrollLock(); 
   });
 </script>
-
 </body>
 </html>
