@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Modular Picker Environment</title>
+    <style>
+        /* Arbitrary page styling for the sandbox environment */
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+            background-color: #f2f2f7;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100dvh;
+            margin: 0;
+        }
+        .trigger-btn {
+            background-color: #007AFF; color: #ffffff; border: none; padding: 16px 32px;
+            font-size: 17px; font-weight: 600; border-radius: 14px; cursor: pointer;
+            box-shadow: 0 4px 14px rgba(0, 122, 255, 0.3); transition: transform 0.15s ease;
+        }
+        .trigger-btn:active { transform: scale(0.96); opacity: 0.85; }
+    </style>
+</head>
+<body>
+
+    <button id="triggerPicker" class="trigger-btn">Open Modular Picker</button>
+
+    <script src="colorPicker.js"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Initialize the picker instance
+            const picker = new IOSColorPicker();
+
+            // Bind the opening mechanism to your arbitrary button
+            document.getElementById('triggerPicker').addEventListener('click', () => {
+                picker.open();
+            });
+        });
+    </script>
+
+</body>
+</html>
