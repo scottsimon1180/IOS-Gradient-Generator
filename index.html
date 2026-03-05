@@ -3,6 +3,9 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  
+  <link rel="apple-touch-icon" href="icon-IOS.png">
+  
   <title>Gradient Generator</title>
   <style>
     :root{
@@ -68,6 +71,11 @@
 
       /* Preserve specific icon text color in dark mode */
       .tb-btn, #minusBtn, #plusBtn { color: #8e8e93 !important; }
+      
+      .tb-btn.tb-toggle-selected {
+        background: rgba(255,255,255,.08);
+        box-shadow: inset 0 2px 5px rgba(0,0,0,.4) !important;
+      }
     }
 
     html.locked, body.locked{ overflow:hidden; position:fixed; touch-action:none; }
@@ -100,20 +108,31 @@
       .res-toolbar{ background: #0b0b0c; border: 1px solid #1f1f22; backdrop-filter: none; }
     }
 
+    /* RE-STYLED TOOLBAR BUTTONS */
     .tb-btn{
-      flex: 1 1 0; min-width: 0; height: 44px; border: none; border-radius: 14px; 
+      flex: 1 1 0; min-width: 0; height: 44px; 
+      border: 1px solid var(--ios-sep);
+      border-radius: 10px; 
       background: var(--ios-btn); 
       color: #85858B; display:flex; align-items:center; justify-content:center; gap: 8px; -webkit-appearance:none;
-      padding: 0 10px; box-shadow: 0 0.5px 0 rgba(0,0,0,.08) inset; user-select:none; -webkit-tap-highlight-color: transparent; outline: none;
+      padding: 0 10px; 
+      box-sizing: border-box;
+      box-shadow: 0 1px 2px rgba(0,0,0,.04); 
+      user-select:none; -webkit-tap-highlight-color: transparent; outline: none; cursor: pointer;
     }
-    .tb-btn:active{ transform: scale(.99); background: var(--ios-btn-press); }
+    .tb-btn:active{ 
+      transform: scale(.97); background: var(--ios-btn-press); box-shadow: none; 
+    }
     .tb-btn svg{ width: 22px; height: 22px; display:block; stroke: currentColor; }
     .tb-text{ font-weight: 900; font-size: 16px; letter-spacing: .2px; line-height: 1; color: currentColor; }
 
+    /* "Pressed" State for Toggles */
     .tb-btn.tb-toggle-selected{
-      box-shadow: 0 0.5px 0 rgba(0,0,0,.08) inset, 0 0 0 2px var(--toggle-border); color: var(--toggle-color); background: rgba(0,0,0,.05);
+      border-color: var(--toggle-border); 
+      color: var(--toggle-color); 
+      background: rgba(0,0,0,.05);
+      box-shadow: inset 0 2px 4px rgba(0,0,0,.08);
     }
-    @media (prefers-color-scheme: dark){ .tb-btn.tb-toggle-selected{ background: rgba(255,255,255,.08); } }
 
     .tb-angle-rotator{ width: 24px; height: 24px; transform-origin: 50% 50%; display:flex; align-items:center; justify-content:center; will-change: transform; }
     .tb-angle-rotator svg{ width:24px; height:24px; }
@@ -121,9 +140,9 @@
     .panel{
       width:100%; background:rgba(255,255,255,.55); border:1px solid rgba(0,0,0,.06); border-radius:16px; padding:14px; box-sizing:border-box; backdrop-filter:blur(10px);
     }
-    .colors-header{ width:100%; display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:10px; }
+    .colors-header{ width:100%; display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:16px; }
     .colors-header-left{ display:flex; align-items:center; gap:3px; min-width:0; }
-    .colors-title{ margin:0; font-size:14px; font-weight:700; text-transform:uppercase; letter-spacing:1px; color:var(--ios-sub); white-space:nowrap; }
+    .colors-title{ margin:0; font-size:16px; font-weight:700; text-transform:uppercase; letter-spacing:1px; color:var(--ios-sub); white-space:nowrap; }
     .info-btn{ border:none; background:transparent; padding:6px 6px; margin:0; font-weight:600; font-size:16px; line-height:1; border-radius:10px; color:var(--ios-text); -webkit-appearance:none; }
     .info-btn:active{ transform:scale(.98); }
 
@@ -133,14 +152,23 @@
     .btn:active{ transform:scale(.99); }
     .btn-alt{ background:#e2e8f0; color:#0f172a; }
 
+    /* RE-STYLED PLUS/MINUS BUTTONS */
     #minusBtn, #plusBtn{ 
-      width: 36px; height: 36px; padding: 0; border-radius: 999px; display:flex; align-items:center; justify-content:center; 
+      width: 36px; height: 36px; padding: 0; 
+      border-radius: 6px; 
+      border: 1px solid var(--ios-sep);
+      display:flex; align-items:center; justify-content:center; 
       -webkit-tap-highlight-color: transparent; user-select:none; 
       background: var(--ios-btn); 
-      color: #85858B; border: none;
+      color: #85858B;
+      box-sizing: border-box;
+      box-shadow: 0 1px 2px rgba(0,0,0,.04);
+      cursor: pointer;
     }
-    #minusBtn svg, #plusBtn svg{ width: 22px; height: 22px; display: block; }
-    #minusBtn:active, #plusBtn:active{ transform:scale(.95); background: var(--ios-btn-press); }
+    #minusBtn svg, #plusBtn svg{ width: 24px; height: 24px; display: block; }
+    #minusBtn:active, #plusBtn:active{ 
+      transform:scale(.95); background: var(--ios-btn-press); box-shadow: none; 
+    }
 
     .colors-list{ display:flex; flex-direction:column; gap:10px; width:100%; }
     
@@ -213,26 +241,15 @@
     .deg-angle-input{ width: 96px; padding: 10px 10px; font-size: 18px; font-weight: 800; text-align: center; border-radius: 12px; border: 1px solid rgba(60,60,67,.22); -webkit-appearance: none; outline: none; background: rgba(120,120,128,.10); color: var(--ios-text); box-sizing: border-box; }
     .deg-angle-input:focus{ border-color: var(--ios-blue); background: rgba(0,122,255,.08); }
     
-    /* RE-STYLED ANGLE PRESETS FOR PROFESSIONAL SOFTWARE LOOK */
-    .preset-row { 
-      display: flex; justify-content: space-between; gap: 6px; width: 100%; flex-wrap: nowrap; margin-bottom: 10px; 
-    }
+    .preset-row { display: flex; justify-content: space-between; gap: 6px; width: 100%; flex-wrap: nowrap; margin-bottom: 10px; }
     .preset-btn { 
-      flex: 1 1 0; /* Forces exact equal width regardless of content */
-      height: 40px; /* Locked height for uniformity */
-      padding: 0;
-      border: 1px solid var(--ios-sep); /* Adds structured, rigid feel */
-      border-radius: 6px; /* Blockier than before */
-      font-weight: 800; font-size: 15px; 
-      background: var(--ios-btn); color: var(--ios-text); 
-      -webkit-appearance: none; min-width: 0; white-space: nowrap; line-height: 1; 
-      box-sizing: border-box;
-      box-shadow: 0 1px 2px rgba(0,0,0,.04); /* Subtly raised tactical look */
-      display: flex; align-items: center; justify-content: center; cursor: pointer;
+      flex: 1 1 0; height: 40px; padding: 0;
+      border: 1px solid var(--ios-sep); border-radius: 6px; 
+      font-weight: 800; font-size: 15px; background: var(--ios-btn); color: var(--ios-text); 
+      -webkit-appearance: none; min-width: 0; white-space: nowrap; line-height: 1; box-sizing: border-box;
+      box-shadow: 0 1px 2px rgba(0,0,0,.04); display: flex; align-items: center; justify-content: center; cursor: pointer;
     }
-    .preset-btn:active { 
-      transform: scale(.97); background: var(--ios-btn-press); box-shadow: none; 
-    }
+    .preset-btn:active { transform: scale(.97); background: var(--ios-btn-press); box-shadow: none; }
     
     .deg-divider{ height:1px; background: var(--ios-sep); margin: 12px 0; }
     
@@ -357,7 +374,7 @@
   <div class="deg-backdrop" id="degBackdrop" role="dialog" aria-modal="true" aria-labelledby="degTitle">
     <div class="deg-card">
       <div class="deg-sheet">
-        <div class="deg-title" id="degTitle">Angle Presets</div>
+        <div class="deg-title" id="degTitle">Angle</div>
         <div class="deg-big-wrap" aria-hidden="true">
           <div id="degBigRotator" class="deg-big-rotator">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
@@ -392,7 +409,7 @@
       <div class="preset-sheet">
         <div class="preset-title" id="presetTitle">Resolution Presets</div>
         <div class="preset-grid" id="presetGrid"></div>
-        <button class="preset-close" id="presetCloseBtn" type="button">Done</button>
+        <button class="preset-close" id="presetCloseBtn" type="button">Cancel</button>
       </div>
     </div>
   </div>
