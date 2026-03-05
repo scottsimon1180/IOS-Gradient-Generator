@@ -1,8 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <link rel="apple-touch-icon" href="https://raw.githubusercontent.com/scottsimon1180/IOS-Gradient-Generator/refs/heads/main/icon.png">
-
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>Gradient Generator</title>
@@ -12,14 +10,12 @@
       --ios-text:#1c1c1e;
       --ios-sub:#8e8e93;
       --ios-sep:rgba(60,60,67,.18);
-      --ios-card:#ffffff; /* solid */
+      --ios-card:#ffffff;
       --ios-shadow:0 20px 60px rgba(0,0,0,.22);
       --ios-blue:#007aff;
       --ios-btn:rgba(120,120,128,.18);
       --ios-btn-press:rgba(120,120,128,.30);
       --radius-lg:20px;
-
-      /* Toggle selected styling */
       --toggle-border: #000000;
       --toggle-color:  #000000;
     }
@@ -51,20 +47,14 @@
         --ios-text:#f2f2f7;
         --ios-sub:#8e8e93;
         --ios-sep:rgba(84,84,88,.55);
-        --ios-card:#1c1c1e; /* solid */
+        --ios-card:#1c1c1e;
         --ios-shadow:0 26px 80px rgba(0,0,0,.55);
         --ios-btn:rgba(120,120,128,.24);
         --ios-btn-press:rgba(120,120,128,.36);
-
-        /* Toggle styling in dark mode */
         --toggle-border: #f2f2f7;
         --toggle-color:  #f2f2f7;
       }
-      input{
-        background-color:#1c1c1e;
-        color:#ffffff;
-        border:1px solid #3a3a3c;
-      }
+      input{ background-color:#1c1c1e; color:#ffffff; border:1px solid #3a3a3c; }
       .section-label, .sub-label, .status{ color:var(--ios-sub); }
       .btn{ background:#2563eb; color:#fff; }
       .btn-alt{ background:#2c2c2e; color:#fff; border:1px solid #3a3a3c; }
@@ -75,461 +65,160 @@
       .modal-title{ color:#f2f2f7; }
       .modal-text{ color:#d1d5db; }
       .modal-close{ background:#2c2c2e; color:#fff; border:1px solid #3a3a3c; }
+
+      .tb-btn, #minusBtn, #plusBtn {
+        background: #2c2c2e !important;
+        color: #8e8e93 !important;
+      }
     }
 
-    /* Locked vs scrollable modes (toggled by JS) */
-    html.locked, body.locked{
-      overflow:hidden;
-      position:fixed;
-      touch-action:none;
-    }
-    html.scrollable, body.scrollable{
-      overflow:auto;
-      position:static;
-      touch-action:pan-y;
-      -webkit-overflow-scrolling:touch;
-    }
+    html.locked, body.locked{ overflow:hidden; position:fixed; touch-action:none; }
+    html.scrollable, body.scrollable{ overflow:auto; position:static; touch-action:pan-y; -webkit-overflow-scrolling:touch; }
 
-    /* Preview row */
     .preview-row{ width:100%; height:160px; position:relative; margin-bottom:18px; }
     .visualizer-container{ width:100%; height:100%; display:flex; justify-content:center; align-items:center; }
     #vector-rect{ transition:all .25s cubic-bezier(.25,.1,.25,1); }
 
     .section{ display:flex; flex-direction:column; align-items:center; width:100%; margin-bottom:18px; }
-    .sub-label{
-      font-size:12px; font-weight:700; color:var(--ios-sub);
-      text-transform:uppercase; letter-spacing:.8px;
-    }
-    .section-label{
-      font-size:14px; font-weight:700; margin-bottom:12px;
-      text-transform:uppercase; letter-spacing:1px; color:var(--ios-sub);
-    }
+    .sub-label{ font-size:12px; font-weight:700; color:var(--ios-sub); text-transform:uppercase; letter-spacing:.8px; }
+    .section-label{ font-size:14px; font-weight:700; margin-bottom:12px; text-transform:uppercase; letter-spacing:1px; color:var(--ios-sub); }
 
-    /* Resolution row */
-    .input-row{
-      display:flex; align-items:center; justify-content:center;
-      gap:14px; font-size:24px; font-weight:500; flex-wrap:wrap;
-    }
+    .input-row{ display:flex; align-items:center; justify-content:center; gap:14px; font-size:24px; font-weight:500; flex-wrap:wrap; }
     .input-col{ display:flex; flex-direction:column; align-items:center; gap:6px; }
     .separator{ padding-top:20px; }
 
     input[type="number"], input[type="text"]{
       width:110px; padding:12px; font-size:20px; text-align:center;
-      border-radius:10px; border:1px solid #c7c7cc;
-      -webkit-appearance:none; outline:none; background:#fff; color:var(--ios-text);
-      box-sizing:border-box;
+      border-radius:10px; border:1px solid #c7c7cc; -webkit-appearance:none; outline:none; background:#fff; color:var(--ios-text); box-sizing:border-box;
     }
     input:focus{ border-color:var(--ios-blue); }
 
-    /* --- Resolution Toolbar --- */
     .res-toolbar{
-      width: 100%;
-      max-width: 520px;
-      margin-top: 12px;
-      display:flex;
-      justify-content: space-between;
-      gap: 10px;
-      padding: 10px 10px;
-      box-sizing:border-box;
-      border-radius: 16px;
-      background: rgba(255,255,255,.55);
-      border: 1px solid rgba(0,0,0,.06);
-      backdrop-filter: blur(10px);
+      width: 100%; max-width: 520px; margin-top: 12px; display:flex; justify-content: space-between; gap: 10px;
+      padding: 10px 10px; box-sizing:border-box; border-radius: 16px; background: rgba(255,255,255,.55);
+      border: 1px solid rgba(0,0,0,.06); backdrop-filter: blur(10px);
     }
     @media (prefers-color-scheme: dark){
-      .res-toolbar{
-        background: #0b0b0c;
-        border: 1px solid #1f1f22;
-        backdrop-filter: none;
-      }
+      .res-toolbar{ background: #0b0b0c; border: 1px solid #1f1f22; backdrop-filter: none; }
     }
 
     .tb-btn{
-      flex: 1 1 0;
-      min-width: 0;
-      height: 44px;
-      border: none;
-      border-radius: 14px;
-      background: var(--ios-btn);
-      color: var(--ios-sub);
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      gap: 8px;
-      -webkit-appearance:none;
-      padding: 0 10px;
-      box-shadow: 0 0.5px 0 rgba(0,0,0,.08) inset;
-      user-select:none;
-      -webkit-tap-highlight-color: transparent;
-      outline: none;
+      flex: 1 1 0; min-width: 0; height: 44px; border: none; border-radius: 14px; background: #F2F2F6;
+      color: #85858B; display:flex; align-items:center; justify-content:center; gap: 8px; -webkit-appearance:none;
+      padding: 0 10px; box-shadow: 0 0.5px 0 rgba(0,0,0,.08) inset; user-select:none; -webkit-tap-highlight-color: transparent; outline: none;
     }
-    .tb-btn:active{
-      transform: scale(.99);
-      background: var(--ios-btn-press);
-    }
-    .tb-btn svg{
-      width: 22px;
-      height: 22px;
-      display:block;
-      stroke: currentColor;
-    }
-    .tb-text{
-      font-weight: 900;
-      font-size: 16px;
-      letter-spacing: .2px;
-      line-height: 1;
-      color: currentColor;
-    }
+    .tb-btn:active{ transform: scale(.99); background: var(--ios-btn-press); }
+    .tb-btn svg{ width: 22px; height: 22px; display:block; stroke: currentColor; }
+    .tb-text{ font-weight: 900; font-size: 16px; letter-spacing: .2px; line-height: 1; color: currentColor; }
 
-    /* Toggle-selected state for x2/x3 */
     .tb-btn.tb-toggle-selected{
-      box-shadow:
-        0 0.5px 0 rgba(0,0,0,.08) inset,
-        0 0 0 2px var(--toggle-border);
-      color: var(--toggle-color);
-      background: rgba(0,0,0,.05);
+      box-shadow: 0 0.5px 0 rgba(0,0,0,.08) inset, 0 0 0 2px var(--toggle-border); color: var(--toggle-color); background: rgba(0,0,0,.05);
     }
-    @media (prefers-color-scheme: dark){
-      .tb-btn.tb-toggle-selected{
-        background: rgba(255,255,255,.08);
-      }
-    }
+    @media (prefers-color-scheme: dark){ .tb-btn.tb-toggle-selected{ background: rgba(255,255,255,.08); } }
 
-    /* Angle icon wrapper uses rotation */
-    .tb-angle-rotator{
-      width: 24px;
-      height: 24px;
-      transform-origin: 50% 50%;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      will-change: transform;
-    }
+    .tb-angle-rotator{ width: 24px; height: 24px; transform-origin: 50% 50%; display:flex; align-items:center; justify-content:center; will-change: transform; }
     .tb-angle-rotator svg{ width:24px; height:24px; }
 
-    /* Color panel */
     .panel{
-      width:100%;
-      background:rgba(255,255,255,.55);
-      border:1px solid rgba(0,0,0,.06);
-      border-radius:16px;
-      padding:14px;
-      box-sizing:border-box;
-      backdrop-filter:blur(10px);
+      width:100%; background:rgba(255,255,255,.55); border:1px solid rgba(0,0,0,.06); border-radius:16px; padding:14px; box-sizing:border-box; backdrop-filter:blur(10px);
     }
-
     .colors-header{ width:100%; display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:10px; }
     .colors-header-left{ display:flex; align-items:center; gap:3px; min-width:0; }
-    .colors-title{
-      margin:0; font-size:14px; font-weight:700; text-transform:uppercase;
-      letter-spacing:1px; color:var(--ios-sub); white-space:nowrap;
-    }
-    .info-btn{
-      border:none; background:transparent; padding:6px 6px; margin:0;
-      font-weight:600; font-size:16px; line-height:1;
-      border-radius:10px; color:var(--ios-text); -webkit-appearance:none;
-    }
+    .colors-title{ margin:0; font-size:14px; font-weight:700; text-transform:uppercase; letter-spacing:1px; color:var(--ios-sub); white-space:nowrap; }
+    .info-btn{ border:none; background:transparent; padding:6px 6px; margin:0; font-weight:600; font-size:16px; line-height:1; border-radius:10px; color:var(--ios-text); -webkit-appearance:none; }
     .info-btn:active{ transform:scale(.98); }
 
     .btn-row{ display:flex; gap:10px; }
-
-    .btn, .btn-alt{
-      border:none; border-radius:12px; padding:10px 14px;
-      font-weight:800; font-size:18px; -webkit-appearance:none;
-    }
+    .btn, .btn-alt{ border:none; border-radius:12px; padding:10px 14px; font-weight:800; font-size:18px; -webkit-appearance:none; }
     .btn{ background:#2563eb; color:#fff; }
     .btn:active{ transform:scale(.99); }
     .btn-alt{ background:#e2e8f0; color:#0f172a; }
 
-    /* (4) PLUS / MINUS: circular + equal width/height */
-    #minusBtn, #plusBtn{
-      width: 44px;
-      height: 44px;
-      padding: 0;
-      border-radius: 999px;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      font-size: 22px;
-      font-weight: 900;
-      line-height: 1;
-      -webkit-tap-highlight-color: transparent;
-      user-select:none;
+    #minusBtn, #plusBtn{ 
+      width: 44px; height: 44px; padding: 0; border-radius: 999px; display:flex; align-items:center; justify-content:center; 
+      -webkit-tap-highlight-color: transparent; user-select:none; background: #F2F2F6; color: #85858B; border: none;
     }
+    #minusBtn svg, #plusBtn svg{ width: 28px; height: 28px; display: block; }
 
     .colors-list{ display:flex; flex-direction:column; gap:10px; width:100%; }
-    .color-row{ display:flex; align-items:center; gap:8px; width:100%; flex-wrap:nowrap; min-width:0; }
-    .color-row .row-label{
-      width:108px; font-size:12px; font-weight:800; color:#64748b;
-      text-transform:uppercase; letter-spacing:.6px;
-      flex:0 0 auto; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+    
+    .color-row{ 
+      display:flex; align-items:center; gap:8px; width:100%; flex-wrap:nowrap; min-width:0; 
+      position: relative; transition: box-shadow 0.2s, transform 0.2s; background: transparent; border-radius: 12px;
     }
-    .color-row input.color-text{
-      flex:1 1 auto; min-width:0; width:auto;
-      text-align:left; padding:10px 10px; font-size:15px;
+    .color-row.is-dragging {
+      z-index: 100; opacity: 0.85; background: var(--ios-card); box-shadow: 0 10px 30px rgba(0,0,0,0.15); transform: scale(1.02);
+    }
+    @media (prefers-color-scheme: dark) {
+      .color-row.is-dragging { background: #2c2c2e; box-shadow: 0 10px 30px rgba(0,0,0,0.4); }
     }
 
-    /* iOS-like color picker icon */
+    .color-row .row-label{ width:108px; font-size:12px; font-weight:800; color:#64748b; text-transform:uppercase; letter-spacing:.6px; flex:0 0 auto; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .color-row input.color-text{ flex:1 1 auto; min-width:0; width:auto; text-align:left; padding:10px 10px; font-size:15px; }
+
     .picker-wrap{ position:relative; width:34px; height:34px; flex:0 0 auto; }
-    .picker-ios{
-      position:absolute; inset:0; border-radius:999px;
-      background:conic-gradient(#ff3b30,#ff9500,#ffcc00,#34c759,#00c7be,#007aff,#5856d6,#af52de,#ff2d55,#ff3b30);
-      display:flex; align-items:center; justify-content:center;
-      box-shadow:none;
+    .picker-ios{ position:absolute; inset:0; border-radius:999px; background:conic-gradient(#ff3b30,#ff9500,#ffcc00,#34c759,#00c7be,#007aff,#5856d6,#af52de,#ff2d55,#ff3b30); display:flex; align-items:center; justify-content:center; box-shadow:none; }
+    .picker-ios::before{ content:""; width:25px; height:25px; border-radius:999px; background:rgba(255,255,255,.92); box-shadow:0 0 0 .5px rgba(0,0,0,.12); }
+    .picker-center{ position:absolute; left:50%; top:50%; transform:translate(-50%,-50%); width:18px; height:18px; border-radius:999px; background:#fff; box-shadow:0 0 0 1.5px rgba(255,255,255,.95), 0 0 0 .5px rgba(0,0,0,.20); }
+    input.color-native{ position:absolute; inset:0; opacity:.001; width:100%; height:100%; border:none; padding:0; margin:0; -webkit-appearance:none; background:transparent; }
+
+    .drag-handle {
+      flex: 0 0 auto; width: 34px; height: 34px; display: flex; align-items: center; justify-content: center;
+      color: var(--ios-sub); cursor: grab; touch-action: none; -webkit-tap-highlight-color: transparent;
     }
-    .picker-ios::before{
-      content:""; width:25px; height:25px; border-radius:999px;
-      background:rgba(255,255,255,.92);
-      box-shadow:0 0 0 .5px rgba(0,0,0,.12);
-    }
-    .picker-center{
-      position:absolute; left:50%; top:50%;
-      transform:translate(-50%,-50%);
-      width:18px; height:18px; border-radius:999px; background:#fff;
-      box-shadow:0 0 0 1.5px rgba(255,255,255,.95), 0 0 0 .5px rgba(0,0,0,.20);
-    }
-    input.color-native{
-      position:absolute; inset:0; opacity:.001;
-      width:100%; height:100%; border:none; padding:0; margin:0;
-      -webkit-appearance:none; background:transparent;
-    }
+    .drag-handle:active { cursor: grabbing; color: var(--ios-text); }
+    .drag-handle svg { width: 22px; height: 22px; display: block; stroke: currentColor; }
 
     .footer{ width:100%; margin-top:6px; display:flex; flex-direction:column; gap:10px; align-items:center; }
     .status{ width:100%; text-align:center; font-size:13px; font-weight:700; color:#64748b; min-height:18px; }
 
     #renderCanvas{ display:none; }
 
-    /* Color help modal */
-    .modal-backdrop{
-      position:fixed; inset:0; background:rgba(0,0,0,.35);
-      display:none; align-items:center; justify-content:center;
-      padding:22px; box-sizing:border-box; z-index:999;
-    }
-    .modal-backdrop.show{ display:flex; }
-    .modal-card{
-      width:100%; max-width:520px; border-radius:18px; background:#fff;
-      border:1px solid rgba(0,0,0,.08);
-      box-shadow:0 20px 55px rgba(15,23,42,.22);
-      padding:16px 16px 14px 16px; box-sizing:border-box;
-    }
-    .modal-title{
-      font-weight:900; font-size:14px; letter-spacing:1px; text-transform:uppercase;
-      color:#111827; margin:2px 0 10px 0;
-    }
-    .modal-text{
-      font-size:14px; line-height:1.35; color:#334155; font-weight:600;
-      margin:0 0 12px 0;
-    }
-    .modal-text code{
-      font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono","Courier New", monospace;
-      font-size:12px; font-weight:800;
-    }
-    .modal-close{
-      width:100%; border:none; border-radius:12px; padding:12px 14px;
-      font-weight:900; font-size:16px; -webkit-appearance:none;
-      background:#e2e8f0; color:#0f172a;
-    }
-    .modal-close:active{ transform:scale(.99); }
+    .modal-backdrop, .deg-backdrop, .preset-backdrop{ position:fixed; inset:0; display:none; align-items:center; justify-content:center; padding:22px; box-sizing:border-box; z-index:999; background: rgba(0,0,0,.35); }
+    .modal-backdrop.show, .deg-backdrop.show, .preset-backdrop.show{ display:flex; }
+    .modal-card, .deg-card, .preset-card{ width:100%; max-width:520px; border-radius:18px; background:var(--ios-card); border:1px solid rgba(0,0,0,.10); box-shadow:var(--ios-shadow); overflow:hidden; }
+    .modal-card { padding:16px 16px 14px 16px; }
+    .modal-title, .deg-title, .preset-title{ font-weight:800; font-size:13px; letter-spacing:.9px; text-transform:uppercase; color:var(--ios-sub); margin:0 0 14px 0; }
+    .modal-card .modal-title { font-weight:900; font-size:14px; letter-spacing:1px; color:#111827; margin:2px 0 10px 0; }
+    @media (prefers-color-scheme: dark){ .modal-card .modal-title { color:#f2f2f7; } }
+    .modal-text{ font-size:14px; line-height:1.35; color:#334155; font-weight:600; margin:0 0 12px 0; }
+    .modal-text code{ font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono","Courier New", monospace; font-size:12px; font-weight:800; }
+    .modal-close, .deg-close, .preset-close{ width:100%; border:none; border-radius:12px; padding:12px 14px; font-weight:900; font-size:16px; -webkit-appearance:none; background:transparent; color:var(--ios-blue); }
+    .modal-close:active, .deg-close:active, .preset-close:active{ background:rgba(0,122,255,.12); }
+    .modal-close { background:#e2e8f0; color:#0f172a; }
+    @media (prefers-color-scheme: dark){ .modal-close { background:#2c2c2e; color:#fff; border:1px solid #3a3a3c; } }
 
-    /* ANGLE POPUP */
-    .deg-backdrop{
-      position:fixed;
-      inset:0;
-      display:none;
-      align-items:center;
-      justify-content:center;
-      padding:22px;
-      box-sizing:border-box;
-      z-index:1000;
-      background: rgba(0,0,0,.28);
-    }
-    .deg-backdrop.show{ display:flex; }
-
-    .deg-card{
-      width:100%;
-      max-width:520px;
-      border-radius: var(--radius-lg);
-      background: var(--ios-card);
-      border: 1px solid rgba(0,0,0,.10);
-      box-shadow: var(--ios-shadow);
-      overflow:hidden;
-    }
-    .deg-sheet{
-      padding: 16px 16px 14px 16px;
-      box-sizing:border-box;
-      text-align:center;
-    }
-    .deg-title{
-      font-weight:800;
-      font-size:13px;
-      letter-spacing:.9px;
-      text-transform:uppercase;
-      color: var(--ios-sub);
-      margin: 0 0 14px 0;
-    }
-    .deg-big-wrap{
-      width:120px; height:120px;
-      margin: 0 auto 10px auto;
-      display:flex; align-items:center; justify-content:center;
-    }
-    .deg-big-rotator{
-      width:120px; height:120px;
-      transform-origin:50% 50%;
-      display:flex; align-items:center; justify-content:center;
-      will-change:transform;
-    }
+    .deg-sheet, .preset-sheet{ padding: 16px 16px 14px 16px; box-sizing:border-box; text-align:center; }
+    .deg-big-wrap{ width:120px; height:120px; margin: 0 auto 10px auto; display:flex; align-items:center; justify-content:center; }
+    .deg-big-rotator{ width:120px; height:120px; transform-origin:50% 50%; display:flex; align-items:center; justify-content:center; will-change:transform; }
     .deg-big-rotator svg{ width:120px; height:120px; display:block; }
-
-    .deg-angle-row{
-      display:flex;
-      justify-content:center;
-      align-items:center;
-      margin: 2px 0 14px 0;
-    }
-    .deg-angle-input{
-      width: 96px;
-      padding: 10px 10px;
-      font-size: 18px;
-      font-weight: 800;
-      text-align: center;
-      border-radius: 12px;
-      border: 1px solid rgba(60,60,67,.22);
-      -webkit-appearance: none;
-      outline: none;
-      background: rgba(120,120,128,.10);
-      color: var(--ios-text);
-      box-sizing: border-box;
-    }
-    .deg-angle-input:focus{
-      border-color: var(--ios-blue);
-      background: rgba(0,122,255,.08);
-    }
-    .preset-row{
-      display:flex;
-      justify-content:center;
-      gap:10px;
-      flex-wrap:nowrap;
-      margin-bottom:10px;
-    }
-    .preset-btn{
-      border:none;
-      border-radius:12px;
-      padding:8px 17px;
-      font-weight:800;
-      font-size:15px;
-      background: var(--ios-btn);
-      color: var(--ios-text);
-      -webkit-appearance:none;
-      min-width:0;
-      white-space:nowrap;
-      line-height:1;
-      box-shadow: 0 0.5px 0 rgba(0,0,0,.08) inset;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-    }
-    .preset-btn:active{
-      transform:scale(.99);
-      background: var(--ios-btn-press);
-    }
-    .deg-divider{
-      height:1px;
-      background: var(--ios-sep);
-      margin: 12px 0;
-    }
-    .deg-close{
-      width:100%;
-      border:none;
-      padding:14px 14px;
-      font-weight:900;
-      font-size:17px;
-      -webkit-appearance:none;
-      background: transparent;
-      color: var(--ios-blue);
-    }
-    .deg-close:active{
-      background: rgba(0,122,255,.12);
-    }
-
-    /* PRESETS POPUP */
-    .preset-backdrop{
-      position:fixed;
-      inset:0;
-      display:none;
-      align-items:center;
-      justify-content:center;
-      padding:22px;
-      box-sizing:border-box;
-      z-index:1001;
-      background: rgba(0,0,0,.28);
-    }
-    .preset-backdrop.show{ display:flex; }
-
-    .preset-card{
-      width:100%;
-      max-width:520px;
-      border-radius: var(--radius-lg);
-      background: var(--ios-card);
-      border: 1px solid rgba(0,0,0,.10);
-      box-shadow: var(--ios-shadow);
-      overflow:hidden;
-    }
-    .preset-sheet{
-      padding: 16px 16px 14px 16px;
-      box-sizing:border-box;
-      text-align:center;
-    }
-    .preset-title{
-      font-weight:800;
-      font-size:13px;
-      letter-spacing:.9px;
-      text-transform:uppercase;
-      color: var(--ios-sub);
-      margin: 0 0 14px 0;
-    }
-    .preset-grid{
-      display:grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-      margin-bottom: 12px;
-    }
+    .deg-angle-row{ display:flex; justify-content:center; align-items:center; margin: 2px 0 14px 0; }
+    .deg-angle-input{ width: 96px; padding: 10px 10px; font-size: 18px; font-weight: 800; text-align: center; border-radius: 12px; border: 1px solid rgba(60,60,67,.22); -webkit-appearance: none; outline: none; background: rgba(120,120,128,.10); color: var(--ios-text); box-sizing: border-box; }
+    .deg-angle-input:focus{ border-color: var(--ios-blue); background: rgba(0,122,255,.08); }
+    .preset-row{ display:flex; justify-content:center; gap:10px; flex-wrap:nowrap; margin-bottom:10px; }
+    .preset-btn{ border:none; border-radius:12px; padding:8px 17px; font-weight:800; font-size:15px; background: var(--ios-btn); color: var(--ios-text); -webkit-appearance:none; min-width:0; white-space:nowrap; line-height:1; box-shadow: 0 0.5px 0 rgba(0,0,0,.08) inset; display:flex; align-items:center; justify-content:center; }
+    .preset-btn:active{ transform:scale(.99); background: var(--ios-btn-press); }
+    .deg-divider{ height:1px; background: var(--ios-sep); margin: 12px 0; }
+    
+    /* Updated Preset Grid & Item UI */
+    .preset-grid{ display:grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px; }
+    @media (max-width: 440px) { .preset-grid { grid-template-columns: 1fr; } }
+    
     .preset-item{
-      border:none;
-      border-radius:12px;
-      padding: 12px 10px;
-      background: var(--ios-btn);
-      color: var(--ios-text);
-      font-weight: 900;
-      font-size: 14px;
-      line-height: 1.1;
-      -webkit-appearance:none;
-      box-shadow: 0 0.5px 0 rgba(0,0,0,.08) inset;
-      white-space: nowrap;
+      display: flex; align-items: center; text-align: left; gap: 12px;
+      border:none; border-radius:12px; padding: 12px 14px; background: var(--ios-btn); color: var(--ios-text); 
+      -webkit-appearance:none; box-shadow: 0 0.5px 0 rgba(0,0,0,.08) inset;
     }
-    .preset-item:active{
-      transform: scale(.99);
-      background: var(--ios-btn-press);
+    .preset-item:active{ transform: scale(.98); background: var(--ios-btn-press); }
+    
+    .preset-icon {
+      flex: 0 0 auto; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; color: var(--ios-text);
     }
-    .preset-sub{
-      display:block;
-      margin-top: 4px;
-      font-weight: 800;
-      font-size: 12px;
-      color: var(--ios-sub);
-      letter-spacing: .2px;
-    }
-    .preset-close{
-      width:100%;
-      border:none;
-      border-radius: 12px;
-      padding: 12px 14px;
-      font-weight: 900;
-      font-size: 16px;
-      -webkit-appearance:none;
-      background: transparent;
-      color: var(--ios-blue);
-    }
-    .preset-close:active{ background: rgba(0,122,255,.12); }
+    .preset-icon svg { width: 100%; height: 100%; display: block; }
+    
+    .preset-info { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+    .preset-label { font-weight: 900; font-size: 14px; line-height: 1.1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .preset-sub { font-weight: 700; font-size: 12px; color: var(--ios-sub); letter-spacing: .2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
     .hidden{ display:none !important; }
   </style>
@@ -546,37 +235,26 @@
     </div>
   </div>
 
-  <!-- (2) Removed the "RESOLUTION" label row; keeping just the inputs + toolbar -->
   <div class="section">
     <div class="input-row">
       <div class="input-col">
-        <!-- (3) W -> Width -->
         <div class="sub-label">Width</div>
         <input type="number" id="resW" value="3840" inputmode="numeric" pattern="\d*">
       </div>
-
       <span class="separator">x</span>
-
       <div class="input-col">
-        <!-- (3) H -> Height -->
         <div class="sub-label">Height</div>
         <input type="number" id="resH" value="2160" inputmode="numeric" pattern="\d*">
       </div>
     </div>
 
     <div class="res-toolbar" role="toolbar" aria-label="Resolution tools">
-      <!-- Presets -->
       <button class="tb-btn" id="tbPresets" type="button" aria-label="Resolution presets">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="64" height="64" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
           <rect x="3" y="3" width="18" height="18" rx="4" />
-          <path d="M9 3v18" />
-          <path d="M15 3v18" />
-          <path d="M3 9h18" />
-          <path d="M3 15h18" />
+          <path d="M9 3v18" /><path d="M15 3v18" /><path d="M3 9h18" /><path d="M3 15h18" />
         </svg>
       </button>
-
-      <!-- Angle -->
       <button class="tb-btn" id="tbAngle" type="button" aria-label="Angle presets">
         <div id="tbAngleRotator" class="tb-angle-rotator" aria-hidden="true">
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
@@ -586,26 +264,13 @@
           </svg>
         </div>
       </button>
-
-      <!-- Swap -->
       <button class="tb-btn" id="tbSwap" type="button" aria-label="Swap width and height">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M4 7h16" />
-          <path d="M16 3l4 4-4 4" />
-          <path d="M20 17H4" />
-          <path d="M8 13l-4 4 4 4" />
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M4 7h16" /><path d="M16 3l4 4-4 4" /><path d="M20 17H4" /><path d="M8 13l-4 4 4 4" />
         </svg>
       </button>
-
-      <!-- x2 TOGGLE -->
-      <button class="tb-btn" id="tbX2" type="button" aria-label="Toggle x2 scale">
-        <span class="tb-text">x2</span>
-      </button>
-
-      <!-- x3 TOGGLE -->
-      <button class="tb-btn" id="tbX3" type="button" aria-label="Toggle x3 scale">
-        <span class="tb-text">x3</span>
-      </button>
+      <button class="tb-btn" id="tbX2" type="button" aria-label="Toggle x2 scale"><span class="tb-text">x2</span></button>
+      <button class="tb-btn" id="tbX3" type="button" aria-label="Toggle x3 scale"><span class="tb-text">x3</span></button>
     </div>
   </div>
 
@@ -617,20 +282,24 @@
         <div class="colors-title">Colors</div>
         <button class="info-btn" id="infoBtn" type="button" aria-label="Color input help">?⃝</button>
       </div>
-
       <div class="btn-row">
-        <button class="btn-alt" id="minusBtn" type="button">−</button>
-        <button class="btn-alt" id="plusBtn" type="button">+</button>
+        <button class="btn-alt" id="minusBtn" type="button" aria-label="Remove color">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="-1 -1 22.3516 22.3516">
+            <g><path d="M10.1719 20.3516C15.7891 20.3516 20.3516 15.7969 20.3516 10.1797C20.3516 4.5625 15.7891 0 10.1719 0C4.55469 0 0 4.5625 0 10.1797C0 15.7969 4.55469 20.3516 10.1719 20.3516ZM10.1719 18.8984C5.35156 18.8984 1.45312 15 1.45312 10.1797C1.45312 5.35938 5.35156 1.46094 10.1719 1.46094C14.9922 1.46094 18.8906 5.35938 18.8906 10.1797C18.8906 15 14.9922 18.8984 10.1719 18.8984Z" fill="currentColor" stroke="none"/><path d="M6.03906 10.9141L14.2969 10.9141C14.7734 10.9141 15.1094 10.6484 15.1094 10.2031C15.1094 9.74219 14.7969 9.46875 14.2969 9.46875L6.03906 9.46875C5.54688 9.46875 5.22656 9.74219 5.22656 10.2031C5.22656 10.6484 5.5625 10.9141 6.03906 10.9141Z" fill="currentColor" stroke="none"/></g>
+          </svg>
+        </button>
+        <button class="btn-alt" id="plusBtn" type="button" aria-label="Add color">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="-1 -1 22.3516 22.3516">
+            <g><path d="M10.1719 20.3516C15.7891 20.3516 20.3516 15.7969 20.3516 10.1797C20.3516 4.5625 15.7891 0 10.1719 0C4.55469 0 0 4.5625 0 10.1797C0 15.7969 4.55469 20.3516 10.1719 20.3516ZM10.1719 18.8984C5.35156 18.8984 1.45312 15 1.45312 10.1797C1.45312 5.35938 5.35156 1.46094 10.1719 1.46094C14.9922 1.46094 18.8906 5.35938 18.8906 10.1797C18.8906 15 14.9922 18.8984 10.1719 18.8984Z" fill="currentColor" stroke="none"/><path d="M10.8828 14.0469L10.8828 6.28906C10.8828 5.85156 10.5859 5.54688 10.1562 5.54688C9.74219 5.54688 9.44531 5.85156 9.44531 6.28906L9.44531 14.0469C9.44531 14.4766 9.74219 14.7812 10.1562 14.7812C10.5859 14.7812 10.8828 14.4844 10.8828 14.0469ZM6.28906 10.8828L14.0469 10.8828C14.4766 10.8828 14.7812 10.5938 14.7812 10.1797C14.7812 9.74219 14.4844 9.44531 14.0469 9.44531L6.28906 9.44531C5.85156 9.44531 5.55469 9.74219 5.55469 10.1797C5.55469 10.5938 5.85156 10.8828 6.28906 10.8828Z" fill="currentColor" stroke="none"/></g>
+          </svg>
+        </button>
       </div>
     </div>
-
     <div class="colors-list" id="colorsList"></div>
   </div>
 
   <div class="footer">
-    <button class="btn" id="generateBtn" type="button" style="width:100%; padding:14px 16px; font-size:18px;">
-      Generate Gradient
-    </button>
+    <button class="btn" id="generateBtn" type="button" style="width:100%; padding:14px 16px; font-size:18px;">Generate Gradient</button>
     <div class="status" id="status"></div>
   </div>
 
@@ -652,12 +321,10 @@
     </div>
   </div>
 
-  <!-- Angle popup modal -->
   <div class="deg-backdrop" id="degBackdrop" role="dialog" aria-modal="true" aria-labelledby="degTitle">
     <div class="deg-card">
       <div class="deg-sheet">
         <div class="deg-title" id="degTitle">Angle Presets</div>
-
         <div class="deg-big-wrap" aria-hidden="true">
           <div id="degBigRotator" class="deg-big-rotator">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
@@ -667,11 +334,9 @@
             </svg>
           </div>
         </div>
-
         <div class="deg-angle-row">
           <input id="degAngleInput" class="deg-angle-input" type="text" inputmode="numeric" value="0" aria-label="Angle in degrees">
         </div>
-
         <div class="preset-row">
           <button class="preset-btn" type="button" data-deg="0">0°</button>
           <button class="preset-btn" type="button" data-deg="45">45°</button>
@@ -679,27 +344,21 @@
           <button class="preset-btn" type="button" data-deg="135">135°</button>
           <button class="preset-btn" type="button" data-deg="180">180°</button>
         </div>
-
         <div class="preset-row" style="margin-bottom:0;">
           <button class="preset-btn" type="button" id="btnHInvert" aria-label="Flip horizontally"></button>
           <button class="preset-btn" type="button" id="btnVInvert" aria-label="Flip vertically"></button>
         </div>
-
         <div class="deg-divider"></div>
-
         <button class="deg-close" id="degCloseBtn" type="button">Done</button>
       </div>
     </div>
   </div>
 
-  <!-- Presets popup modal -->
   <div class="preset-backdrop" id="presetBackdrop" role="dialog" aria-modal="true" aria-labelledby="presetTitle">
     <div class="preset-card">
       <div class="preset-sheet">
         <div class="preset-title" id="presetTitle">Resolution Presets</div>
-
         <div class="preset-grid" id="presetGrid"></div>
-
         <button class="preset-close" id="presetCloseBtn" type="button">Done</button>
       </div>
     </div>
@@ -711,10 +370,8 @@
   function setScrollLock(locked){
     const html = document.documentElement;
     const body = document.body;
-
     html.classList.remove('locked','scrollable');
     body.classList.remove('locked','scrollable');
-
     if (locked){
       html.classList.add('locked');
       body.classList.add('locked');
@@ -726,11 +383,22 @@
     }
   }
 
+  // Calculates total DOM height vs Viewport height to evaluate scroll constraints
+  function updateDynamicScrollLock() {
+    const footer = document.querySelector('.footer');
+    if (!footer) return;
+    
+    // Total height = distance from top of body + height of footer + 30px body bottom padding
+    const totalContentHeight = footer.offsetTop + footer.offsetHeight + 30;
+    
+    // Lock scroll exclusively if the total content fits within the visible viewport window
+    setScrollLock(totalContentHeight <= window.innerHeight);
+  }
+
   const resW = document.getElementById('resW');
   const resH = document.getElementById('resH');
   const angleDegInput = document.getElementById('angleDeg');
 
-  // Toolbar
   const tbPresets = document.getElementById('tbPresets');
   const tbAngle   = document.getElementById('tbAngle');
   const tbSwap    = document.getElementById('tbSwap');
@@ -738,63 +406,42 @@
   const tbX3      = document.getElementById('tbX3');
   const tbAngleRotator = document.getElementById('tbAngleRotator');
 
-  // Toggle state for x2/x3
-  let scaleMode = 1;                 // 1, 2, or 3
-  let baseW = null, baseH = null;    // remembers the "unscaled" values
+  let scaleMode = 1;
+  let baseW = null, baseH = null;
 
   function readIntOr0(v){ const n = parseInt(String(v||'').trim(), 10); return Number.isFinite(n) ? n : 0; }
-  function clampRes(n){ return Math.max(1, (n|0)); } // no max cap
+  function clampRes(n){ return Math.max(1, (n|0)); }
 
   function clearScaleSelection(){
-    scaleMode = 1;
-    baseW = null; baseH = null;
-    tbX2.classList.remove('tb-toggle-selected');
-    tbX3.classList.remove('tb-toggle-selected');
+    scaleMode = 1; baseW = null; baseH = null;
+    tbX2.classList.remove('tb-toggle-selected'); tbX3.classList.remove('tb-toggle-selected');
   }
 
   function applyScaleToInputs(){
-    if (baseW === null || baseH === null){
-      baseW = readIntOr0(resW.value);
-      baseH = readIntOr0(resH.value);
-    }
-    const w = clampRes(baseW * scaleMode);
-    const h = clampRes(baseH * scaleMode);
-    resW.value = String(w);
-    resH.value = String(h);
+    if (baseW === null || baseH === null){ baseW = readIntOr0(resW.value); baseH = readIntOr0(resH.value); }
+    resW.value = String(clampRes(baseW * scaleMode));
+    resH.value = String(clampRes(baseH * scaleMode));
   }
 
   function setScaleMode(newMode){
     scaleMode = newMode;
-
     tbX2.classList.toggle('tb-toggle-selected', scaleMode === 2);
     tbX3.classList.toggle('tb-toggle-selected', scaleMode === 3);
-
     if (scaleMode === 1){
-      if (baseW !== null && baseH !== null){
-        resW.value = String(baseW);
-        resH.value = String(baseH);
-      }
+      if (baseW !== null && baseH !== null){ resW.value = String(baseW); resH.value = String(baseH); }
       baseW = null; baseH = null;
-    } else {
-      applyScaleToInputs();
-    }
-
+    } else { applyScaleToInputs(); }
     updatePreviewGradient();
   }
 
   function onUserManualResolutionEdit(){
     if (scaleMode !== 1){
-      const w = readIntOr0(resW.value);
-      const h = readIntOr0(resH.value);
-      baseW = Math.round(w / scaleMode);
-      baseH = Math.round(h / scaleMode);
+      baseW = Math.round(readIntOr0(resW.value) / scaleMode);
+      baseH = Math.round(readIntOr0(resH.value) / scaleMode);
       applyScaleToInputs();
-    } else {
-      baseW = null; baseH = null;
-    }
+    } else { baseW = null; baseH = null; }
   }
 
-  // Modals
   const presetBackdrop = document.getElementById('presetBackdrop');
   const presetCloseBtn = document.getElementById('presetCloseBtn');
   const presetGrid     = document.getElementById('presetGrid');
@@ -844,24 +491,11 @@
     return a;
   }
 
-  function updateToolbarAngleRotation(deg){
-    if (tbAngleRotator) tbAngleRotator.style.transform = `rotate(${deg}deg)`;
-  }
-
-  function stripDegreeSuffix(s){
-    return String(s || '').trim().replace(/°/g,'').trim();
-  }
-  function setPopupAngleText(deg, withDegree){
-    const a = normalizeAngleDeg(deg);
-    degAngleInput.value = withDegree ? `${a}°` : `${a}`;
-  }
-  function readPopupAngleNumeric(){
-    return normalizeAngleDeg(stripDegreeSuffix(degAngleInput.value));
-  }
-
-  function updateDegreeBigRotation(deg){
-    if (degBigRotator) degBigRotator.style.transform = `rotate(${deg}deg)`;
-  }
+  function updateToolbarAngleRotation(deg){ if (tbAngleRotator) tbAngleRotator.style.transform = `rotate(${deg}deg)`; }
+  function stripDegreeSuffix(s){ return String(s || '').trim().replace(/°/g,'').trim(); }
+  function setPopupAngleText(deg, withDegree){ degAngleInput.value = withDegree ? `${normalizeAngleDeg(deg)}°` : `${normalizeAngleDeg(deg)}`; }
+  function readPopupAngleNumeric(){ return normalizeAngleDeg(stripDegreeSuffix(degAngleInput.value)); }
+  function updateDegreeBigRotation(deg){ if (degBigRotator) degBigRotator.style.transform = `rotate(${deg}deg)`; }
 
   function setAngleDeg(deg){
     const a = normalizeAngleDeg(deg);
@@ -879,16 +513,9 @@
     updateDegreeBigRotation(a);
     setTimeout(() => { try { document.activeElement && document.activeElement.blur(); } catch(_){} }, 0);
   }
-  function closeDegModal(){
-    const a = readPopupAngleNumeric();
-    setAngleDeg(a);
-    degBackdrop.classList.remove('show');
-  }
+  function closeDegModal(){ setAngleDeg(readPopupAngleNumeric()); degBackdrop.classList.remove('show'); }
 
-  degAngleInput.addEventListener('focus', () => {
-    const a = readPopupAngleNumeric();
-    setPopupAngleText(a, false);
-  });
+  degAngleInput.addEventListener('focus', () => setPopupAngleText(readPopupAngleNumeric(), false));
   degAngleInput.addEventListener('input', () => {
     const a = readPopupAngleNumeric();
     angleDegInput.value = String(a);
@@ -896,65 +523,68 @@
     updateDegreeBigRotation(a);
     updateToolbarAngleRotation(a);
   });
-  degAngleInput.addEventListener('blur', () => {
-    const a = readPopupAngleNumeric();
-    setAngleDeg(a);
-  });
+  degAngleInput.addEventListener('blur', () => setAngleDeg(readPopupAngleNumeric()));
 
   degBackdrop.querySelectorAll('.preset-btn[data-deg]').forEach(btn => {
     btn.addEventListener('click', () => {
-      const deg = parseInt(btn.getAttribute('data-deg'), 10) || 0;
-      setAngleDeg(deg);
+      setAngleDeg(parseInt(btn.getAttribute('data-deg'), 10) || 0);
       try { degAngleInput.blur(); } catch(_) {}
     });
   });
 
-  btnHInvert.addEventListener('click', () => {
-    const cur = readPopupAngleNumeric();
-    setAngleDeg(-cur);
-    try { degAngleInput.blur(); } catch(_) {}
-  });
-
-  btnVInvert.addEventListener('click', () => {
-    const cur = readPopupAngleNumeric();
-    setAngleDeg(180 - cur);
-    try { degAngleInput.blur(); } catch(_) {}
-  });
-
+  btnHInvert.addEventListener('click', () => { setAngleDeg(-readPopupAngleNumeric()); try { degAngleInput.blur(); } catch(_) {} });
+  btnVInvert.addEventListener('click', () => { setAngleDeg(180 - readPopupAngleNumeric()); try { degAngleInput.blur(); } catch(_) {} });
   degCloseBtn.addEventListener('click', closeDegModal);
   degBackdrop.addEventListener('click', (e) => { if (e.target === degBackdrop) closeDegModal(); });
-
   tbAngle.addEventListener('click', openDegModal);
 
-  // ===== Resolution Presets (your requested grid order) =====
   const RES_PRESETS = [
-    { w: 1920, h: 1080, label: "1920×1080", sub: "1080p / 16:9" },
-    { w: 3840, h: 2160, label: "3840×2160", sub: "4K / 16:9" },
-    { w: 1170, h: 2532, label: "1170×2532", sub: "iPhone 13 Pro" },
-    { w: 1620, h: 2160, label: "1620×2160", sub: "iPad 9th Gen" },
-    { w: 2048, h: 2048, label: "2048×2048", sub: "Icon (XL) / 1:1" },
-    { w: 1024, h: 1024, label: "1024×1024", sub: "Icon (L) / 1:1" },
+    { 
+      w: 1920, h: 1080, label: "1920×1080", sub: "1080p / 16:9",
+      icon: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="-1 -1 26.789100646972656 21.67970085144043"><path d="M2.44531 16.4766L22.3516 16.4766C23.9609 16.4766 24.7891 15.6797 24.7891 14.0391L24.7891 2.4375C24.7891 0.796875 23.9609 0 22.3516 0L2.44531 0C0.835938 0 0 0.796875 0 2.4375L0 14.0391C0 15.6797 0.835938 16.4766 2.44531 16.4766ZM7.39844 19.6797L17.3984 19.6797C17.7812 19.6797 18.0938 19.3672 18.0938 18.9844C18.0938 18.5938 17.7812 18.2812 17.3984 18.2812L7.39844 18.2812C7.00781 18.2812 6.69531 18.5938 6.69531 18.9844C6.69531 19.3672 7.00781 19.6797 7.39844 19.6797Z" fill="currentColor" stroke="none"/></svg>`
+    },
+    { 
+      w: 3840, h: 2160, label: "3840×2160", sub: "4K / 16:9",
+      icon: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="-1 -1 26.789100646972656 21.67970085144043"><path d="M18.0938 18.9844C18.0938 19.3672 17.7812 19.6797 17.3984 19.6797L7.39844 19.6797C7.00781 19.6797 6.69531 19.3672 6.69531 18.9844C6.69531 18.5938 7.00781 18.2812 7.39844 18.2812L17.3984 18.2812C17.7812 18.2812 18.0938 18.5938 18.0938 18.9844ZM24.7891 2.4375L24.7891 14.0391C24.7891 15.6797 23.9609 16.4766 22.3516 16.4766L2.44531 16.4766C0.835938 16.4766 0 15.6797 0 14.0391L0 2.4375C0 0.796875 0.835938 0 2.44531 0L22.3516 0C23.9609 0 24.7891 0.796875 24.7891 2.4375ZM12.6016 4.64844L12.6016 11.8672C12.6016 12.2812 12.8516 12.5625 13.2578 12.5625C13.7109 12.5625 13.9375 12.25 13.9375 11.8672L13.9375 9.85938L14.6484 8.76562L16.6094 12.0625C16.7891 12.375 16.9609 12.5391 17.3125 12.5391C17.6797 12.5391 17.9062 12.2734 17.9062 11.9297C17.9062 11.7266 17.8672 11.6016 17.75 11.3984L15.6016 7.84375L17.4844 5.08594C17.5859 4.9375 17.6641 4.79688 17.6641 4.57812C17.6641 4.26562 17.4453 3.97656 17.0547 3.97656C16.7266 3.97656 16.5859 4.15625 16.4688 4.34375L13.9844 8.10938L13.9219 8.10938L13.9219 4.64844C13.9219 4.25781 13.6875 3.96094 13.2578 3.96094C12.8438 3.96094 12.6016 4.23438 12.6016 4.64844ZM8.125 4.83594L6.11719 9.07812C5.96094 9.42969 5.90625 9.67188 5.90625 9.95312C5.90625 10.3984 6.21094 10.7109 6.67188 10.7109L9.07031 10.7109L9.07031 11.8906C9.07031 12.3594 9.40625 12.5469 9.70312 12.5469C10.0391 12.5469 10.3203 12.3203 10.3203 11.8906L10.3203 10.7109L10.7578 10.7109C11.1172 10.7109 11.2812 10.4766 11.2812 10.1719C11.2812 9.875 11.125 9.64062 10.7578 9.64062L10.3203 9.64062L10.3203 4.92188C10.3203 4.27344 9.90625 3.9375 9.32031 3.9375C8.67969 3.9375 8.38281 4.26562 8.125 4.83594ZM9.09375 9.66406L7.03906 9.66406L7.03906 9.60938L9.05469 5.125L9.09375 5.125Z" fill="currentColor" stroke="none"/></svg>`
+    },
+    { 
+      w: 1170, h: 2532, label: "1170×2532", sub: "iPhone 13 Pro",
+      icon: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="-1 -1 14.531200408935547 22.976600646972656"><path d="M2.83594 19.5938C1.88281 19.5938 1.38281 19.1094 1.38281 18.1953L1.38281 2.78125C1.38281 1.86719 1.88281 1.38281 2.83594 1.38281L4.09375 1.38281C4.25 1.38281 4.32812 1.46875 4.32812 1.61719L4.32812 1.8125C4.32812 2.20312 4.58594 2.47656 4.97656 2.47656L7.5625 2.47656C7.95312 2.47656 8.20312 2.20312 8.20312 1.8125L8.20312 1.61719C8.20312 1.46875 8.28906 1.38281 8.4375 1.38281L9.69531 1.38281C10.6406 1.38281 11.1406 1.86719 11.1406 2.78125L11.1406 18.1953C11.1406 19.1094 10.6406 19.5938 9.69531 19.5938Z" fill="currentColor" opacity="0.3" stroke="none"/><path d="M2.66406 20.9766L9.85938 20.9766C11.4922 20.9766 12.5312 19.9766 12.5312 18.3984L12.5312 2.57812C12.5312 1 11.4922 0 9.85938 0L2.66406 0C1.03125 0 0 1 0 2.57812L0 18.3984C0 19.9766 1.03125 20.9766 2.66406 20.9766ZM2.83594 19.5938C1.88281 19.5938 1.38281 19.1094 1.38281 18.1953L1.38281 2.78125C1.38281 1.86719 1.88281 1.38281 2.83594 1.38281L4.09375 1.38281C4.25 1.38281 4.32812 1.46875 4.32812 1.61719L4.32812 1.8125C4.32812 2.20312 4.58594 2.47656 4.97656 2.47656L7.5625 2.47656C7.95312 2.47656 8.20312 2.20312 8.20312 1.8125L8.20312 1.61719C8.20312 1.46875 8.28906 1.38281 8.4375 1.38281L9.69531 1.38281C10.6406 1.38281 11.1406 1.86719 11.1406 2.78125L11.1406 18.1953C11.1406 19.1094 10.6406 19.5938 9.69531 19.5938ZM4.15625 18.8672L8.375 18.8672C8.625 18.8672 8.79688 18.6953 8.79688 18.4453C8.79688 18.1953 8.625 18.0234 8.375 18.0234L4.15625 18.0234C3.91406 18.0234 3.73438 18.1953 3.73438 18.4453C3.73438 18.6953 3.91406 18.8672 4.15625 18.8672Z" fill="currentColor" stroke="none"/></svg>`
+    },
+    { 
+      w: 1620, h: 2160, label: "1620×2160", sub: "iPad 9th Gen",
+      icon: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="-1 -1 18.578100204467773 24.398399353027344"><path d="M1.38281 19.5234L1.38281 2.875C1.38281 1.92188 1.9375 1.38281 2.91406 1.38281L13.6562 1.38281C14.6328 1.38281 15.1875 1.92188 15.1875 2.875L15.1875 19.5234C15.1875 20.4688 14.6328 21.0078 13.6562 21.0078L2.91406 21.0078C1.9375 21.0078 1.38281 20.4688 1.38281 19.5234Z" fill="currentColor" opacity="0.3" stroke="none"/><path d="M5.46875 20.2422L11.1172 20.2422C11.3594 20.2422 11.5391 20.0703 11.5391 19.8125C11.5391 19.5625 11.3594 19.3906 11.1172 19.3906L5.46875 19.3906C5.21875 19.3906 5.04688 19.5625 5.04688 19.8125C5.04688 20.0703 5.21875 20.2422 5.46875 20.2422ZM0 19.7422C0 21.3594 1.07812 22.3984 2.75 22.3984L13.8281 22.3984C15.5 22.3984 16.5781 21.3594 16.5781 19.7422L16.5781 2.65625C16.5781 1.03906 15.5 0 13.8281 0L2.75 0C1.07812 0 0 1.03906 0 2.65625ZM1.38281 19.5234L1.38281 2.875C1.38281 1.92188 1.9375 1.38281 2.91406 1.38281L13.6562 1.38281C14.6328 1.38281 15.1875 1.92188 15.1875 2.875L15.1875 19.5234C15.1875 20.4688 14.6328 21.0078 13.6562 21.0078L2.91406 21.0078C1.9375 21.0078 1.38281 20.4688 1.38281 19.5234Z" fill="currentColor" stroke="none"/></svg>`
+    },
+    { 
+      w: 2048, h: 2048, label: "2048×2048", sub: "Icon (XL) / 1:1",
+      icon: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="1 1 22 22"><path d="M20.47,3.53C19.48,2.53,17.98,2,16.05,2h-8.1C6.02,2,4.51,2.55,3.53,3.53C2.53,4.52,2,6.03,2,7.95v8.09 c0,1.93,0.52,3.42,1.53,4.43C4.52,21.46,6.02,22,7.95,22h8.1c1.94,0,3.44-0.55,4.42-1.53c1.01-1,1.53-2.5,1.53-4.43V7.95 C22,6.03,21.48,4.53,20.47,3.53z M11.9,15.84c0.12,0.16,0.17,0.3,0.17,0.49c0,0.39-0.3,0.68-0.71,0.68c-0.3,0-0.47-0.11-0.7-0.43 l-2.42-3.51H8.2l-2.43,3.51C5.54,16.89,5.38,17,5.08,17c-0.39,0-0.69-0.28-0.69-0.64c0-0.19,0.05-0.31,0.17-0.49l2.79-3.93 L4.69,8.21c-0.14-0.2-0.2-0.34-0.2-0.54C4.49,7.3,4.82,7,5.21,7c0.32,0,0.49,0.1,0.7,0.4l2.4,3.52h0.05l2.36-3.51 C10.93,7.1,11.11,7,11.41,7c0.39,0,0.7,0.28,0.7,0.64c0,0.17-0.05,0.32-0.18,0.49l-2.78,3.86L11.9,15.84z M18.98,17H13.9 c-0.47,0-0.74-0.35-0.74-0.84V7.83c0-0.5,0.25-0.83,0.74-0.83c0.49,0,0.76,0.31,0.76,0.83v7.93h4.32c0.36,0,0.63,0.23,0.63,0.62 C19.61,16.75,19.35,17,18.98,17z" fill="currentColor"/></svg>`
+    },
+    { 
+      w: 1024, h: 1024, label: "1024×1024", sub: "Icon (L) / 1:1",
+      icon: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="1 1 22 22"><path d="M20.47,3.53C19.48,2.53,17.98,2,16.05,2h-8.1C6.02,2,4.51,2.55,3.53,3.53C2.53,4.52,2,6.03,2,7.95v8.09 c0,1.93,0.52,3.42,1.53,4.43C4.52,21.46,6.02,22,7.95,22h8.1c1.94,0,3.44-0.55,4.42-1.53c1.01-1,1.53-2.5,1.53-4.43V7.95 C22,6.03,21.48,4.53,20.47,3.53z M14.6,17H9.51c-0.47,0-0.74-0.35-0.74-0.84V7.83C8.78,7.33,9.03,7,9.51,7 c0.49,0,0.76,0.31,0.76,0.83v7.93h4.32c0.36,0,0.63,0.23,0.63,0.62C15.22,16.75,14.96,17,14.6,17z" fill="currentColor"/></svg>`
+    },
   ];
 
-  function openPresetModal(){
-    presetBackdrop.classList.add('show');
-    setTimeout(() => { try { document.activeElement && document.activeElement.blur(); } catch(_){} }, 0);
-  }
+  function openPresetModal(){ presetBackdrop.classList.add('show'); setTimeout(() => { try { document.activeElement && document.activeElement.blur(); } catch(_){} }, 0); }
   function closePresetModal(){ presetBackdrop.classList.remove('show'); }
 
   function buildPresetGrid(){
     presetGrid.innerHTML = '';
     for (const p of RES_PRESETS){
       const btn = document.createElement('button');
-      btn.type = 'button';
-      btn.className = 'preset-item';
-      btn.innerHTML = `${p.label}<span class="preset-sub">${p.sub}</span>`;
+      btn.type = 'button'; btn.className = 'preset-item';
+      
+      btn.innerHTML = `
+        <div class="preset-icon">${p.icon}</div>
+        <div class="preset-info">
+          <span class="preset-label">${p.label}</span>
+          <span class="preset-sub">${p.sub}</span>
+        </div>
+      `;
+      
       btn.addEventListener('click', () => {
-        clearScaleSelection();
-        resW.value = String(p.w);
-        resH.value = String(p.h);
-        updatePreviewGradient();
-        closePresetModal();
+        clearScaleSelection(); resW.value = String(p.w); resH.value = String(p.h);
+        updatePreviewGradient(); closePresetModal();
       });
       presetGrid.appendChild(btn);
     }
@@ -965,30 +595,16 @@
   presetBackdrop.addEventListener('click', (e) => { if (e.target === presetBackdrop) closePresetModal(); });
 
   tbSwap.addEventListener('click', () => {
-    if (scaleMode !== 1 && baseW !== null && baseH !== null){
-      const t = baseW; baseW = baseH; baseH = t;
-      applyScaleToInputs();
-    } else {
-      const w = resW.value, h = resH.value;
-      resW.value = h; resH.value = w;
-    }
+    if (scaleMode !== 1 && baseW !== null && baseH !== null){ const t = baseW; baseW = baseH; baseH = t; applyScaleToInputs(); }
+    else { const w = resW.value, h = resH.value; resW.value = h; resH.value = w; }
     updatePreviewGradient();
   });
 
   tbX2.addEventListener('click', () => { (scaleMode === 2) ? setScaleMode(1) : setScaleMode(2); });
   tbX3.addEventListener('click', () => { (scaleMode === 3) ? setScaleMode(1) : setScaleMode(3); });
-
   resW.addEventListener('input', () => { onUserManualResolutionEdit(); updatePreviewGradient(); });
   resH.addEventListener('input', () => { onUserManualResolutionEdit(); updatePreviewGradient(); });
 
-  // ---------- (1) "Ghost text" clear-on-type behavior ----------
-  // Behavior:
-  // - On focus: if field has content and isn't already in ghost mode:
-  //     keep the content, but tint it grey
-  // - On first real typing (printable key / paste / delete/backspace):
-  //     clear the field and replace with user's input
-  // - If user blurs without typing:
-  //     restore original color (and keep the original text)
   function attachGhostClearBehavior(inputEl){
     if (!inputEl || inputEl.dataset.ghostInit === '1') return;
     inputEl.dataset.ghostInit = '1';
@@ -997,83 +613,45 @@
     const setNormal = () => { inputEl.style.color = ''; };
 
     inputEl.addEventListener('focus', () => {
-      // do not enter ghost mode if empty
       if (!inputEl.value) return;
-
-      // mark as ghosting (text visible but grey)
       inputEl.dataset.ghosting = '1';
       inputEl.dataset.ghostValue = inputEl.value;
       setGrey();
-
-      // optional: place caret at end (iOS can be inconsistent; harmless)
       try { inputEl.setSelectionRange(inputEl.value.length, inputEl.value.length); } catch(_) {}
     });
 
     inputEl.addEventListener('blur', () => {
-      if (inputEl.dataset.ghosting === '1'){
-        // user never typed; revert to normal color
-        setNormal();
-        delete inputEl.dataset.ghosting;
-        delete inputEl.dataset.ghostValue;
-      }
+      if (inputEl.dataset.ghosting === '1'){ setNormal(); delete inputEl.dataset.ghosting; delete inputEl.dataset.ghostValue; }
     });
 
     inputEl.addEventListener('keydown', (e) => {
       if (inputEl.dataset.ghosting !== '1') return;
-
-      const isPrintable =
-        e.key && e.key.length === 1 &&
-        !e.ctrlKey && !e.metaKey && !e.altKey;
-
-      // If they hit backspace/delete as first action, just clear.
+      const isPrintable = e.key && e.key.length === 1 && !e.ctrlKey && !e.metaKey && !e.altKey;
       if (e.key === 'Backspace' || e.key === 'Delete'){
-        e.preventDefault();
-        inputEl.value = '';
-        setNormal();
-        delete inputEl.dataset.ghosting;
-        delete inputEl.dataset.ghostValue;
-        return;
+        e.preventDefault(); inputEl.value = ''; setNormal();
+        delete inputEl.dataset.ghosting; delete inputEl.dataset.ghostValue; return;
       }
-
       if (isPrintable){
-        // replace ghost text with the very first typed character
-        e.preventDefault();
-        inputEl.value = e.key;
-        setNormal();
-        delete inputEl.dataset.ghosting;
-        delete inputEl.dataset.ghostValue;
-
-        // trigger any listeners that rely on input events
-        inputEl.dispatchEvent(new Event('input', { bubbles:true }));
-        return;
+        e.preventDefault(); inputEl.value = e.key; setNormal();
+        delete inputEl.dataset.ghosting; delete inputEl.dataset.ghostValue;
+        inputEl.dispatchEvent(new Event('input', { bubbles:true })); return;
       }
     });
 
     inputEl.addEventListener('paste', (e) => {
       if (inputEl.dataset.ghosting !== '1') return;
       e.preventDefault();
-
-      const text = (e.clipboardData || window.clipboardData).getData('text') || '';
-      inputEl.value = text;
-      setNormal();
-      delete inputEl.dataset.ghosting;
-      delete inputEl.dataset.ghostValue;
-
+      inputEl.value = (e.clipboardData || window.clipboardData).getData('text') || '';
+      setNormal(); delete inputEl.dataset.ghosting; delete inputEl.dataset.ghostValue;
       inputEl.dispatchEvent(new Event('input', { bubbles:true }));
     });
   }
 
-  // ---------- Color parsing helpers ----------
-  function cssColorIsValid(s){
-    const el = document.createElement('div');
-    el.style.color = '';
-    el.style.color = s;
-    return !!el.style.color;
-  }
+  function cssColorIsValid(s){ const el = document.createElement('div'); el.style.color = ''; el.style.color = s; return !!el.style.color; }
+  
   function normalizeColorInput(raw){
     const s = (raw || '').trim();
     if (!s) return null;
-
     const m = s.match(/^(\d{1,3})\s*[, ]\s*(\d{1,3})\s*[, ]\s*(\d{1,3})$/);
     if (m) {
       const r = Math.max(0, Math.min(255, parseInt(m[1],10)));
@@ -1084,6 +662,7 @@
     if (/^[0-9a-fA-F]{6}$/.test(s)) return '#' + s;
     return s;
   }
+
   function stopLabel(i,n){
     if (n===2) return i===0 ? "Top" : "Bottom";
     if (n===3) return i===0 ? "Top" : (i===1 ? "Middle" : "Bottom");
@@ -1091,16 +670,11 @@
     if (i===n-1) return `Color ${n} (Bottom)`;
     return `Color ${i+1}`;
   }
+
   function parseToRGB255(norm){
-    const t = document.createElement('canvas');
-    t.width=1; t.height=1;
-    const c = t.getContext('2d');
-    c.clearRect(0,0,1,1);
-    c.fillStyle = '#000';
-    c.fillStyle = norm;
-    c.fillRect(0,0,1,1);
-    const d = c.getImageData(0,0,1,1).data;
-    return [d[0], d[1], d[2]];
+    const t = document.createElement('canvas'); t.width=1; t.height=1; const c = t.getContext('2d');
+    c.clearRect(0,0,1,1); c.fillStyle = '#000'; c.fillStyle = norm; c.fillRect(0,0,1,1);
+    const d = c.getImageData(0,0,1,1).data; return [d[0], d[1], d[2]];
   }
 
   function clampU8(v){ return v<0?0 : v>255?255 : (v|0); }
@@ -1108,33 +682,20 @@
   function randomSigned(){ return (Math.random()*2)-1; }
 
   function updateVectorAspect(){
-    const w = parseFloat(resW.value)||1;
-    const h = parseFloat(resH.value)||1;
-    const cw = svgContainer.clientWidth;
-    const ch = svgContainer.clientHeight;
-
-    const scale = 0.82;
-    const maxW = cw*scale, maxH = ch*scale;
-
-    let rw = maxW;
-    let rh = (maxW / w) * h;
+    const w = parseFloat(resW.value)||1, h = parseFloat(resH.value)||1;
+    const cw = svgContainer.clientWidth, ch = svgContainer.clientHeight;
+    const scale = 0.82; const maxW = cw*scale, maxH = ch*scale;
+    let rw = maxW, rh = (maxW / w) * h;
     if (rh > maxH) { rh = maxH; rw = (maxH / h) * w; }
-
-    vectorRect.setAttribute('x', (cw-rw)/2);
-    vectorRect.setAttribute('y', (ch-rh)/2);
-    vectorRect.setAttribute('width', rw);
-    vectorRect.setAttribute('height', rh);
+    vectorRect.setAttribute('x', (cw-rw)/2); vectorRect.setAttribute('y', (ch-rh)/2);
+    vectorRect.setAttribute('width', rw); vectorRect.setAttribute('height', rh);
   }
 
   function gradientEndpointsFromAngleDeg(deg){
     const rad = deg * Math.PI / 180;
-    const dx = -Math.sin(rad);
-    const dy =  Math.cos(rad);
-    const cx=0.5, cy=0.5;
-    const sx = (dx===0)?Infinity:0.5/Math.abs(dx);
-    const sy = (dy===0)?Infinity:0.5/Math.abs(dy);
-    const s = Math.min(sx, sy);
-    return { x1: cx-dx*s, y1: cy-dy*s, x2: cx+dx*s, y2: cy+dy*s };
+    const dx = -Math.sin(rad), dy = Math.cos(rad), cx=0.5, cy=0.5;
+    const sx = (dx===0)?Infinity:0.5/Math.abs(dx), sy = (dy===0)?Infinity:0.5/Math.abs(dy);
+    const s = Math.min(sx, sy); return { x1: cx-dx*s, y1: cy-dy*s, x2: cx+dx*s, y2: cy+dy*s };
   }
 
   function getColorValuesForPreview(){
@@ -1151,50 +712,37 @@
   function updatePreviewGradient(){
     updateVectorAspect();
     const deg = normalizeAngleDeg(angleDegInput.value);
-
     gradEl.innerHTML = '';
     const cols = getColorValuesForPreview();
-
     const ep = gradientEndpointsFromAngleDeg(deg);
     gradEl.setAttribute('gradientUnits','objectBoundingBox');
-    gradEl.setAttribute('x1', ep.x1);
-    gradEl.setAttribute('y1', ep.y1);
-    gradEl.setAttribute('x2', ep.x2);
-    gradEl.setAttribute('y2', ep.y2);
+    gradEl.setAttribute('x1', ep.x1); gradEl.setAttribute('y1', ep.y1);
+    gradEl.setAttribute('x2', ep.x2); gradEl.setAttribute('y2', ep.y2);
 
     if (!cols || cols.length < 2) {
-      const s0 = document.createElementNS('http://www.w3.org/2000/svg','stop');
-      s0.setAttribute('offset','0%'); s0.setAttribute('stop-color','#808080');
-      const s1 = document.createElementNS('http://www.w3.org/2000/svg','stop');
-      s1.setAttribute('offset','100%'); s1.setAttribute('stop-color','#808080');
-      gradEl.appendChild(s0); gradEl.appendChild(s1);
-      return;
+      const s0 = document.createElementNS('http://www.w3.org/2000/svg','stop'); s0.setAttribute('offset','0%'); s0.setAttribute('stop-color','#808080');
+      const s1 = document.createElementNS('http://www.w3.org/2000/svg','stop'); s1.setAttribute('offset','100%'); s1.setAttribute('stop-color','#808080');
+      gradEl.appendChild(s0); gradEl.appendChild(s1); return;
     }
 
     const n = cols.length;
     for (let i=0;i<n;i++){
       const stop = document.createElementNS('http://www.w3.org/2000/svg','stop');
       stop.setAttribute('offset', ((i/(n-1))*100).toFixed(4)+'%');
-      stop.setAttribute('stop-color', cols[i]);
-      gradEl.appendChild(stop);
+      stop.setAttribute('stop-color', cols[i]); gradEl.appendChild(stop);
     }
   }
 
   function computeStopPositions(n){
-    if (n===1) return [0];
-    const out=[];
-    for (let i=0;i<n;i++) out.push(i/(n-1));
-    return out;
+    if (n===1) return [0]; const out=[]; for (let i=0;i<n;i++) out.push(i/(n-1)); return out;
   }
+  
   function findSegmentIndex(t, pos){
-    if (t<=pos[0]) return 0;
-    const last = pos.length-1;
-    if (t>=pos[last]) return last-1;
+    if (t<=pos[0]) return 0; const last = pos.length-1; if (t>=pos[last]) return last-1;
     for (let i=0;i<last;i++) if (t>=pos[i] && t<=pos[i+1]) return i;
     return last-1;
   }
 
-  // ===== Progress button UX =====
   const GEN_BTN_ORIG_BG = generateBtn.style.background || '';
   const GEN_BTN_ORIG_COLOR = generateBtn.style.color || '';
   const GEN_BTN_ORIG_TEXT = generateBtn.textContent;
@@ -1203,405 +751,256 @@
     const p = Math.max(0, Math.min(100, Math.round(pct)));
     generateBtn.disabled = true;
     generateBtn.style.background = `linear-gradient(to right, rgba(37,99,235,1) ${p}%, rgba(226,232,240,1) ${p}%)`;
-    generateBtn.style.color = '#ffffff';
-    generateBtn.style.position = 'relative';
-    generateBtn.style.overflow = 'hidden';
+    generateBtn.style.color = '#ffffff'; generateBtn.style.position = 'relative'; generateBtn.style.overflow = 'hidden';
     generateBtn.textContent = `Generating… ${p}%`;
   }
 
   function restoreGenerateButtonDefault(){
-    generateBtn.disabled = false;
-    generateBtn.style.background = GEN_BTN_ORIG_BG;
-    generateBtn.style.color = GEN_BTN_ORIG_COLOR;
-    generateBtn.style.display = '';
-    generateBtn.style.alignItems = '';
-    generateBtn.style.justifyContent = '';
-    generateBtn.style.gap = '';
-    generateBtn.style.position = '';
-    generateBtn.style.overflow = '';
-    generateBtn.textContent = GEN_BTN_ORIG_TEXT;
-    generateBtn.innerHTML = 'Generate Gradient';
+    generateBtn.disabled = false; generateBtn.style.background = GEN_BTN_ORIG_BG; generateBtn.style.color = GEN_BTN_ORIG_COLOR;
+    generateBtn.style.display = ''; generateBtn.style.alignItems = ''; generateBtn.style.justifyContent = ''; generateBtn.style.gap = '';
+    generateBtn.style.position = ''; generateBtn.style.overflow = ''; generateBtn.textContent = GEN_BTN_ORIG_TEXT; generateBtn.innerHTML = 'Generate Gradient';
   }
 
-  // Save Gradient (second tap) state
-  const SAVE_ICON_SVG = `
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 2048 2048" aria-hidden="true" focusable="false"
-         style="width:22px;height:22px;display:block;fill:currentColor;">
-      <path d="M1505.91 635.02H1247.7v188.83h258.21c16.02 0 26.84 7.45 33.09 13.71c6.25 6.25 13.71 17.07 13.71 33.09v828.44c0 16.02-7.45 26.84-13.71 33.09c-6.25 6.25-17.07 13.71-33.09 13.71H542.09c-16.02 0-26.84-7.45-33.09-13.71c-6.25-6.25-13.71-17.07-13.71-33.09V870.65c0-16.02 7.45-26.84 13.71-33.09c6.25-6.25 17.07-13.71 33.09-13.71h258.85V635.02H542.09c-130.13 0-235.63 105.49-235.63 235.63v828.44c0 130.13 105.49 235.63 235.63 235.63h963.83c130.13 0 235.63-105.49 235.63-235.63V870.65C1741.54 740.51 1636.05 635.02 1505.91 635.02z"/>
-      <path d="M1297.25 938.44l-243.34 254.17c-13.85 13.85-36.31 13.85-50.16 0L750.75 938.45" fill="none" stroke="currentColor" stroke-width="135" stroke-linecap="round"/>
-      <line x1="1028.82" y1="178.42" x2="1028.82" y2="1147.78" fill="none" stroke="currentColor" stroke-width="159" stroke-linecap="round"/>
-    </svg>
-  `;
+  const SAVE_ICON_SVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 2048 2048" aria-hidden="true" focusable="false" style="width:22px;height:22px;display:block;fill:currentColor;"><path d="M1505.91 635.02H1247.7v188.83h258.21c16.02 0 26.84 7.45 33.09 13.71c6.25 6.25 13.71 17.07 13.71 33.09v828.44c0 16.02-7.45 26.84-13.71 33.09c-6.25 6.25-17.07 13.71-33.09 13.71H542.09c-16.02 0-26.84-7.45-33.09-13.71c-6.25-6.25-13.71-17.07-13.71-33.09V870.65c0-16.02 7.45-26.84 13.71-33.09c6.25-6.25 17.07-13.71 33.09-13.71h258.85V635.02H542.09c-130.13 0-235.63 105.49-235.63 235.63v828.44c0 130.13 105.49 235.63 235.63 235.63h963.83c130.13 0 235.63-105.49 235.63-235.63V870.65C1741.54 740.51 1636.05 635.02 1505.91 635.02z"/><path d="M1297.25 938.44l-243.34 254.17c-13.85 13.85-36.31 13.85-50.16 0L750.75 938.45" fill="none" stroke="currentColor" stroke-width="135" stroke-linecap="round"/><line x1="1028.82" y1="178.42" x2="1028.82" y2="1147.78" fill="none" stroke="currentColor" stroke-width="159" stroke-linecap="round"/></svg>`;
 
   function setGenerateButtonSaveMode(){
-    generateBtn.disabled = false;
-    generateBtn.style.background = '#22c55e';   // green
-    generateBtn.style.color = '#ffffff';
-    generateBtn.style.display = 'flex';
-    generateBtn.style.alignItems = 'center';
-    generateBtn.style.justifyContent = 'center';
-    generateBtn.style.gap = '0';
-    generateBtn.style.position = 'relative';
-
-    // Centered text + right-aligned icon
-    generateBtn.innerHTML = `
-      <span style="position:absolute;left:50%;transform:translateX(-50%);font-weight:900;">Save Gradient</span>
-      <span style="margin-left:auto;display:flex;align-items:center;color:currentColor;">${SAVE_ICON_SVG}</span>
-    `;
+    generateBtn.disabled = false; generateBtn.style.background = '#22c55e'; generateBtn.style.color = '#ffffff';
+    generateBtn.style.display = 'flex'; generateBtn.style.alignItems = 'center'; generateBtn.style.justifyContent = 'center'; generateBtn.style.gap = '0'; generateBtn.style.position = 'relative';
+    generateBtn.innerHTML = `<span style="position:absolute;left:50%;transform:translateX(-50%);font-weight:900;">Save Gradient</span><span style="margin-left:auto;display:flex;align-items:center;color:currentColor;">${SAVE_ICON_SVG}</span>`;
   }
 
-  // ---------- File/share helpers ----------
   function getNextFilename(){
-    const key='gradient_counter_v9';
-    const n = parseInt(localStorage.getItem(key)||'0',10)+1;
-    localStorage.setItem(key,String(n));
-    return `Gradient (${n}).png`;
+    const key='gradient_counter_v9'; const n = parseInt(localStorage.getItem(key)||'0',10)+1; localStorage.setItem(key,String(n)); return `Gradient (${n}).png`;
   }
 
   async function canvasToPngBlob(){
     const blob = await new Promise(res => canvas.toBlob(res,'image/png'));
-    if (!blob) throw new Error('Failed to export PNG.');
-    return blob;
+    if (!blob) throw new Error('Failed to export PNG.'); return blob;
   }
 
   function isShareGestureError(err){
-    const name = String(err && err.name || '');
-    const msg  = String(err && err.message || err || '');
-    return (
-      name === 'NotAllowedError' ||
-      name === 'SecurityError' ||
-      msg.includes('not allowed') ||
-      msg.includes('denied permission')
-    );
+    const name = String(err && err.name || ''); const msg  = String(err && err.message || err || '');
+    return (name === 'NotAllowedError' || name === 'SecurityError' || msg.includes('not allowed') || msg.includes('denied permission'));
   }
 
   async function tryShareOrDownload(blob, filename){
     const file = new File([blob], filename, { type:'image/png' });
-
-    if (navigator.canShare && navigator.canShare({ files:[file] })) {
-      await navigator.share({ files:[file], title: filename });
-      return `Share sheet opened: ${filename}`;
-    }
-
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = filename;
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
-    setTimeout(()=>URL.revokeObjectURL(url), 1000);
-    return `Downloaded: ${filename}`;
+    if (navigator.canShare && navigator.canShare({ files:[file] })) { await navigator.share({ files:[file], title: filename }); return `Share sheet opened: ${filename}`; }
+    const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = filename; document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(url), 1000); return `Downloaded: ${filename}`;
   }
 
-  // Pending second-tap share state
-  let pendingShare = null; // { blob, filename }
+  let pendingShare = null;
 
   async function doShareNow(){
     if (!pendingShare) return;
-    const { blob, filename } = pendingShare;
-    pendingShare = null;
-    const msg = await tryShareOrDownload(blob, filename);
-    statusEl.textContent = msg;
-    restoreGenerateButtonDefault();
+    const { blob, filename } = pendingShare; pendingShare = null;
+    const msg = await tryShareOrDownload(blob, filename); statusEl.textContent = msg; restoreGenerateButtonDefault();
   }
 
-  // ---------- Gradient render (chunked for progress UI) ----------
   async function renderGradientToCanvasWithProgress(width, height, rgbStops, angleDeg, onProgress){
-    canvas.width = width;
-    canvas.height = height;
-
+    canvas.width = width; canvas.height = height;
     const n = rgbStops.length;
-    if (n === 1) {
-      ctx.fillStyle = `rgb(${rgbStops[0][0]},${rgbStops[0][1]},${rgbStops[0][2]})`;
-      ctx.fillRect(0,0,width,height);
-      onProgress && onProgress(100);
-      return;
-    }
+    if (n === 1) { ctx.fillStyle = `rgb(${rgbStops[0][0]},${rgbStops[0][1]},${rgbStops[0][2]})`; ctx.fillRect(0,0,width,height); onProgress && onProgress(100); return; }
 
-    const img = ctx.createImageData(width, height);
-    const data = img.data;
-
-    const rad = angleDeg * Math.PI / 180;
-    const ax = -Math.sin(rad);
-    const ay =  Math.cos(rad);
-
+    const img = ctx.createImageData(width, height); const data = img.data;
+    const rad = angleDeg * Math.PI / 180; const ax = -Math.sin(rad); const ay =  Math.cos(rad);
     const aspect = width/height;
-    const corners = [
-      [-0.5*aspect, -0.5],
-      [ 0.5*aspect, -0.5],
-      [-0.5*aspect,  0.5],
-      [ 0.5*aspect,  0.5],
-    ];
-    let extent = 0;
-    for (const [cx,cy] of corners) extent = Math.max(extent, Math.abs(cx*ax + cy*ay));
-    if (extent === 0) extent = 1;
+    const corners = [ [-0.5*aspect, -0.5], [ 0.5*aspect, -0.5], [-0.5*aspect,  0.5], [ 0.5*aspect,  0.5] ];
+    let extent = 0; for (const [cx,cy] of corners) extent = Math.max(extent, Math.abs(cx*ax + cy*ay)); if (extent === 0) extent = 1;
 
     const positions = computeStopPositions(n);
-
-    // Chunk rows to keep UI responsive + allow progress updates
-    const rowsPerChunk = Math.max(1, Math.floor(height / 120)); // ~120 updates max
-    let y = 0;
+    const rowsPerChunk = Math.max(1, Math.floor(height / 120)); let y = 0;
 
     while (y < height){
       const yEnd = Math.min(height, y + rowsPerChunk);
-
       for (let yy=y; yy<yEnd; yy++){
         const ny = (yy/(height-1)) - 0.5;
-
         for (let x=0;x<width;x++){
           const nx = ((x/(width-1)) - 0.5) * aspect;
-          let t = (nx*ax + ny*ay) / (2*extent) + 0.5;
-          if (t<0) t=0; if (t>1) t=1;
-
-          const si = findSegmentIndex(t, positions);
-          const t0 = positions[si], t1 = positions[si+1];
-          const lt = (t1===t0)?0:((t-t0)/(t1-t0));
-
+          let t = (nx*ax + ny*ay) / (2*extent) + 0.5; if (t<0) t=0; if (t>1) t=1;
+          const si = findSegmentIndex(t, positions); const t0 = positions[si], t1 = positions[si+1]; const lt = (t1===t0)?0:((t-t0)/(t1-t0));
           const c0 = rgbStops[si], c1 = rgbStops[si+1];
+          let r = lerp(c0[0], c1[0], lt), g = lerp(c0[1], c1[1], lt), b = lerp(c0[2], c1[2], lt);
 
-          let r = lerp(c0[0], c1[0], lt);
-          let g = lerp(c0[1], c1[1], lt);
-          let b = lerp(c0[2], c1[2], lt);
-
-          if (DITHER_AMPLITUDE>0){
-            r += randomSigned()*DITHER_AMPLITUDE;
-            g += randomSigned()*DITHER_AMPLITUDE;
-            b += randomSigned()*DITHER_AMPLITUDE;
-          }
+          if (DITHER_AMPLITUDE>0){ r += randomSigned()*DITHER_AMPLITUDE; g += randomSigned()*DITHER_AMPLITUDE; b += randomSigned()*DITHER_AMPLITUDE; }
 
           const idx = (yy*width + x)*4;
-          data[idx+0] = clampU8(Math.round(r));
-          data[idx+1] = clampU8(Math.round(g));
-          data[idx+2] = clampU8(Math.round(b));
-          data[idx+3] = 255;
+          data[idx+0] = clampU8(Math.round(r)); data[idx+1] = clampU8(Math.round(g)); data[idx+2] = clampU8(Math.round(b)); data[idx+3] = 255;
         }
       }
-
-      y = yEnd;
-      const pct = (y / height) * 100;
-      onProgress && onProgress(pct);
-
-      // Let UI paint
-      await new Promise(requestAnimationFrame);
+      y = yEnd; onProgress && onProgress((y / height) * 100); await new Promise(requestAnimationFrame);
     }
-
-    ctx.putImageData(img, 0, 0);
-    onProgress && onProgress(100);
+    ctx.putImageData(img, 0, 0); onProgress && onProgress(100);
   }
 
-  // ---------- Generate ----------
   async function generateGradient(){
-    // If we're in "Save Gradient" mode, the button tap should try share immediately.
     if (pendingShare){
-      try{
-        await doShareNow();
-      } catch(err){
-        statusEl.textContent = String(err.message || err);
-        // If share still fails, keep Save mode so user can retry
-        pendingShare = pendingShare || null;
-        if (pendingShare) setGenerateButtonSaveMode();
-      }
+      try{ await doShareNow(); } catch(err){ statusEl.textContent = String(err.message || err); pendingShare = pendingShare || null; if (pendingShare) setGenerateButtonSaveMode(); }
       return;
     }
-
     statusEl.textContent='';
-    const w = parseInt(resW.value,10)||0;
-    const h = parseInt(resH.value,10)||0;
+    const w = parseInt(resW.value,10)||0, h = parseInt(resH.value,10)||0;
     if (w<=0 || h<=0) { statusEl.textContent='Enter a valid width and height.'; return; }
-
     const colsNorm = getColorValuesForPreview();
     if (!colsNorm || colsNorm.length<2) { statusEl.textContent='One or more colors are invalid.'; return; }
 
-    const angleDeg = normalizeAngleDeg(angleDegInput.value);
-    const rgbStops = colsNorm.map(parseToRGB255);
-
+    const angleDeg = normalizeAngleDeg(angleDegInput.value); const rgbStops = colsNorm.map(parseToRGB255);
     try{
       setGenerateButtonProgress(0);
       await renderGradientToCanvasWithProgress(w,h,rgbStops,angleDeg,(p)=>setGenerateButtonProgress(p));
-
-      // At 100%, attempt share immediately
-      const filename = getNextFilename();
-      const blob = await canvasToPngBlob();
-
+      const filename = getNextFilename(); const blob = await canvasToPngBlob();
       try{
-        const msg = await tryShareOrDownload(blob, filename);
-        statusEl.textContent = msg;
-        restoreGenerateButtonDefault();
+        const msg = await tryShareOrDownload(blob, filename); statusEl.textContent = msg; restoreGenerateButtonDefault();
       } catch(err){
-        if (isShareGestureError(err)){
-          // Needs a second user gesture: switch to Save Gradient mode
-          pendingShare = { blob, filename };
-          statusEl.textContent = 'Tap “Save Gradient” to open the share sheet.';
-          setGenerateButtonSaveMode();
-        } else {
-          throw err;
-        }
+        if (isShareGestureError(err)){ pendingShare = { blob, filename }; statusEl.textContent = 'Tap “Save Gradient” to open the share sheet.'; setGenerateButtonSaveMode(); }
+        else { throw err; }
       }
-    } catch(err){
-      statusEl.textContent = String(err.message || err);
-      restoreGenerateButtonDefault();
-      pendingShare = null;
-    }
+    } catch(err){ statusEl.textContent = String(err.message || err); restoreGenerateButtonDefault(); pendingShare = null; }
   }
 
-  // ---------- Color Inputs ----------
-  function renderColorInputs(){
-    colorsList.innerHTML='';
-    for (let i=0;i<colorCount;i++){
-      const row = document.createElement('div');
-      row.className='color-row';
+  // --- Dynamic Color Rendering & Drag/Drop Logic ---
 
-      const lbl = document.createElement('div');
-      lbl.className='row-label';
-      lbl.textContent = stopLabel(i,colorCount)+':';
+  function updateColorLabels(){
+    const rows = Array.from(colorsList.querySelectorAll('.color-row'));
+    const n = rows.length;
+    rows.forEach((row, i) => {
+      const lbl = row.querySelector('.row-label');
+      if (lbl) lbl.textContent = stopLabel(i, n) + ':';
+    });
+  }
 
-      const txt = document.createElement('input');
-      txt.className='color-text';
-      txt.type='text';
-      txt.autocapitalize='off';
-      txt.autocomplete='off';
-      txt.spellcheck=false;
-      txt.value = (colorCount===2) ? (i===0?'ff2462':'0a1bff') : '';
+  function setupDragHandle(row, handle) {
+    handle.addEventListener('pointerdown', (e) => {
+      e.preventDefault();
+      row.classList.add('is-dragging');
 
-      const wrap = document.createElement('div');
-      wrap.className='picker-wrap';
-
-      const ring = document.createElement('div');
-      ring.className='picker-ios';
-
-      const center = document.createElement('div');
-      center.className='picker-center';
-      center.style.background = '#ffffff';
-
-      const native = document.createElement('input');
-      native.className='color-native';
-      native.type='color';
-      native.value='#ffffff';
-
-      function setCenterHex(hex){ center.style.background = hex; }
-
-      function syncNativeFromText(){
-        const norm = normalizeColorInput(txt.value);
-        if (norm && cssColorIsValid(norm)) {
-          const rgb = parseToRGB255(norm);
-          const hex = '#' + rgb.map(v=>v.toString(16).padStart(2,'0')).join('');
-          native.value = hex;
-          setCenterHex(hex);
+      const onPointerMove = (moveEvent) => {
+        moveEvent.preventDefault();
+        const currentY = moveEvent.clientY;
+        const siblings = Array.from(colorsList.querySelectorAll('.color-row:not(.is-dragging)'));
+        let targetSibling = null;
+        
+        for (const sibling of siblings) {
+          const rect = sibling.getBoundingClientRect();
+          const midPoint = rect.top + rect.height / 2;
+          if (currentY < midPoint) {
+            targetSibling = sibling;
+            break;
+          }
         }
-      }
-      function syncCenterFromText(){
-        const norm = normalizeColorInput(txt.value);
-        if (norm && cssColorIsValid(norm)) {
-          const rgb = parseToRGB255(norm);
-          const hex = '#' + rgb.map(v=>v.toString(16).padStart(2,'0')).join('');
-          setCenterHex(hex);
+        
+        if (targetSibling) {
+          colorsList.insertBefore(row, targetSibling);
+        } else {
+          colorsList.appendChild(row);
         }
-      }
+      };
 
-      // (1) Attach ghost-clear behavior to the text field
-      attachGhostClearBehavior(txt);
-
-      txt.addEventListener('input', () => {
-        pendingShare = null; // editing invalidates pending file
-        updatePreviewGradient();
-        syncCenterFromText();
-      });
-      syncNativeFromText();
-
-      native.addEventListener('input', () => {
+      const onPointerUp = () => {
+        row.classList.remove('is-dragging');
+        document.removeEventListener('pointermove', onPointerMove);
+        document.removeEventListener('pointerup', onPointerUp);
+        document.removeEventListener('pointercancel', onPointerUp);
         pendingShare = null;
-        const hex = native.value.toLowerCase();
-        txt.value = hex.replace('#','');
-        // If user picked a color, ensure normal text color
-        txt.style.color = '';
-        delete txt.dataset.ghosting;
-        delete txt.dataset.ghostValue;
-
-        setCenterHex(hex);
+        updateColorLabels();
         updatePreviewGradient();
-      });
+      };
 
-      txt.addEventListener('blur', syncNativeFromText);
+      document.addEventListener('pointermove', onPointerMove, { passive: false });
+      document.addEventListener('pointerup', onPointerUp);
+      document.addEventListener('pointercancel', onPointerUp);
+    });
+  }
 
-      wrap.appendChild(ring);
-      wrap.appendChild(center);
-      wrap.appendChild(native);
+  function createColorRowElement(defaultHex = ''){
+    const row = document.createElement('div'); row.className = 'color-row';
+    const lbl = document.createElement('div'); lbl.className = 'row-label';
+    const txt = document.createElement('input'); txt.className = 'color-text'; txt.type = 'text'; txt.autocapitalize = 'off'; txt.autocomplete = 'off'; txt.spellcheck = false; txt.value = defaultHex;
+    const wrap = document.createElement('div'); wrap.className = 'picker-wrap';
+    const ring = document.createElement('div'); ring.className = 'picker-ios';
+    const center = document.createElement('div'); center.className = 'picker-center'; center.style.background = '#ffffff';
+    const native = document.createElement('input'); native.className = 'color-native'; native.type = 'color'; native.value = '#ffffff';
+    
+    // Drag Handle Structure
+    const dragHandle = document.createElement('div');
+    dragHandle.className = 'drag-handle';
+    dragHandle.setAttribute('aria-label', 'Drag to reorder');
+    dragHandle.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>`;
 
-      row.appendChild(lbl);
-      row.appendChild(txt);
-      row.appendChild(wrap);
-      colorsList.appendChild(row);
+    function setCenterHex(hex){ center.style.background = hex; }
+    function syncNativeFromText(){
+      const norm = normalizeColorInput(txt.value);
+      if (norm && cssColorIsValid(norm)) { const rgb = parseToRGB255(norm); const hex = '#' + rgb.map(v=>v.toString(16).padStart(2,'0')).join(''); native.value = hex; setCenterHex(hex); }
+    }
+    function syncCenterFromText(){
+      const norm = normalizeColorInput(txt.value);
+      if (norm && cssColorIsValid(norm)) { const rgb = parseToRGB255(norm); const hex = '#' + rgb.map(v=>v.toString(16).padStart(2,'0')).join(''); setCenterHex(hex); }
     }
 
-    setScrollLock(colorCount <= 4);
+    attachGhostClearBehavior(txt);
+    txt.addEventListener('input', () => { pendingShare = null; updatePreviewGradient(); syncCenterFromText(); });
+    syncNativeFromText();
+
+    native.addEventListener('input', () => {
+      pendingShare = null; const hex = native.value.toLowerCase(); txt.value = hex.replace('#','');
+      txt.style.color = ''; delete txt.dataset.ghosting; delete txt.dataset.ghostValue;
+      setCenterHex(hex); updatePreviewGradient();
+    });
+    txt.addEventListener('blur', syncNativeFromText);
+
+    wrap.appendChild(ring); wrap.appendChild(center); wrap.appendChild(native);
+    row.appendChild(lbl); row.appendChild(txt); row.appendChild(wrap); row.appendChild(dragHandle);
+    
+    setupDragHandle(row, dragHandle);
+    return row;
+  }
+
+  function syncColorRows(){
+    const currentRows = colorsList.children.length;
+    if (currentRows < colorCount) {
+      for (let i = currentRows; i < colorCount; i++) {
+        let defaultHex = '';
+        if (currentRows === 0 && colorCount >= 2) { defaultHex = (i === 0) ? 'ff2462' : '0a1bff'; }
+        colorsList.appendChild(createColorRowElement(defaultHex));
+      }
+    } else if (currentRows > colorCount) {
+      for (let i = currentRows; i > colorCount; i--) { colorsList.removeChild(colorsList.lastChild); }
+    }
+    updateColorLabels();
+    updateDynamicScrollLock(); 
     updatePreviewGradient();
   }
 
-  // Color count controls
-  minusBtn.addEventListener('click', () => {
-    pendingShare = null;
-    colorCount = Math.max(2, colorCount-1);
-    renderColorInputs();
-  });
-  plusBtn.addEventListener('click',  () => {
-    pendingShare = null;
-    colorCount = Math.min(24, colorCount+1);
-    renderColorInputs();
-  });
-
-  // Generate
+  minusBtn.addEventListener('click', () => { pendingShare = null; colorCount = Math.max(2, colorCount-1); syncColorRows(); });
+  plusBtn.addEventListener('click',  () => { pendingShare = null; colorCount = Math.min(24, colorCount+1); syncColorRows(); });
   generateBtn.addEventListener('click', generateGradient);
 
-  // Keyboard escape
   document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape'){
-      closeModal();
-      if (degBackdrop.classList.contains('show')) closeDegModal();
-      if (presetBackdrop.classList.contains('show')) closePresetModal();
-    }
+    if (e.key === 'Escape'){ closeModal(); if (degBackdrop.classList.contains('show')) closeDegModal(); if (presetBackdrop.classList.contains('show')) closePresetModal(); }
   });
 
-  // ===== Flip icons in angle popup (fixed so triangles show) =====
-  const SVG_FLIP_VERTICAL = `
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 2048 2048"
-         aria-hidden="true" focusable="false"
-         style="width:20px;height:20px;display:block;color:currentColor;">
-      <path d="M953.03 1237.46L357.3 1886.54c-56.69 61.77-12.88 161.46 70.96 161.46h1191.47c83.84 0 127.66-99.69 70.96-161.46l-595.73-649.08C1056.79 1195.87 991.2 1195.87 953.03 1237.46z M1094.97 810.54l595.73-649.08C1747.39 99.69 1703.57 0 1619.73 0H428.27c-83.84 0-127.66 99.69-70.96 161.46l595.73 649.08C991.21 852.13 1056.79 852.13 1094.97 810.54z"
-            fill="currentColor" stroke="none" />
-      <path d="M95.7 1024h150m191.3 0h150m191.3 0h150m191.4 0h150m191.3 0h150m191.4 0h150"
-            fill="none" stroke="currentColor" stroke-width="83.4" stroke-linecap="round" />
-    </svg>
-  `;
-
-  const SVG_FLIP_HORIZONTAL = `
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 2048 2048"
-         aria-hidden="true" focusable="false"
-         style="width:20px;height:20px;display:block;color:currentColor;">
-      <path d="M810.54 953.03L161.46 357.3C99.69 300.61 0 344.43 0 428.27v1191.47c0 83.84 99.69 127.66 161.46 70.96l649.08-595.73C852.13 1056.79 852.13 991.2 810.54 953.03z M1237.46 1094.97l649.08 595.73c61.77 56.69 161.46 12.88 161.46-70.96v-1191.47c0-83.84-99.69-127.66-161.46-70.96l-649.08 595.73C1195.87 991.21 1195.87 1056.79 1237.46 1094.97z"
-            fill="currentColor" stroke="none" />
-      <path d="M1024 95.7v150m0 191.3v150m0 191.3v150m0 191.4v150m0 191.3v150m0 191.4v150"
-            fill="none" stroke="currentColor" stroke-width="83.4" stroke-linecap="round" />
-    </svg>
-  `;
-
+  const SVG_FLIP_VERTICAL = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 2048 2048" aria-hidden="true" focusable="false" style="width:20px;height:20px;display:block;color:currentColor;"><path d="M953.03 1237.46L357.3 1886.54c-56.69 61.77-12.88 161.46 70.96 161.46h1191.47c83.84 0 127.66-99.69 70.96-161.46l-595.73-649.08C1056.79 1195.87 991.2 1195.87 953.03 1237.46z M1094.97 810.54l595.73-649.08C1747.39 99.69 1703.57 0 1619.73 0H428.27c-83.84 0-127.66 99.69-70.96 161.46l595.73 649.08C991.21 852.13 1056.79 852.13 1094.97 810.54z" fill="currentColor" stroke="none" /><path d="M95.7 1024h150m191.3 0h150m191.3 0h150m191.4 0h150m191.3 0h150m191.4 0h150" fill="none" stroke="currentColor" stroke-width="83.4" stroke-linecap="round" /></svg>`;
+  const SVG_FLIP_HORIZONTAL = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 2048 2048" aria-hidden="true" focusable="false" style="width:20px;height:20px;display:block;color:currentColor;"><path d="M810.54 953.03L161.46 357.3C99.69 300.61 0 344.43 0 428.27v1191.47c0 83.84 99.69 127.66 161.46 70.96l649.08-595.73C852.13 1056.79 852.13 991.2 810.54 953.03z M1237.46 1094.97l649.08 595.73c61.77 56.69 161.46 12.88 161.46-70.96v-1191.47c0-83.84-99.69-127.66-161.46-70.96l-649.08 595.73C1195.87 991.21 1195.87 1056.79 1237.46 1094.97z" fill="currentColor" stroke="none" /><path d="M1024 95.7v150m0 191.3v150m0 191.3v150m0 191.4v150m0 191.3v150m0 191.4v150" fill="none" stroke="currentColor" stroke-width="83.4" stroke-linecap="round" /></svg>`;
   btnVInvert.innerHTML = SVG_FLIP_VERTICAL;
   btnHInvert.innerHTML = SVG_FLIP_HORIZONTAL;
 
   // Init
   buildPresetGrid();
-  setScrollLock(true);
-  renderColorInputs();
+  syncColorRows(); 
   setAngleDeg(0);
   updatePreviewGradient();
+  updateDynamicScrollLock(); // Enforces logical geometry constraints on load
 
-  // (1) Attach ghost-clear behavior to all always-present inputs
   attachGhostClearBehavior(resW);
   attachGhostClearBehavior(resH);
   attachGhostClearBehavior(degAngleInput);
-
-  // Keep preview correct on orientation/resize
-  window.addEventListener('resize', () => updatePreviewGradient());
+  
+  // Re-evaluates dimensional geometry upon window resize
+  window.addEventListener('resize', () => { 
+    updatePreviewGradient(); 
+    updateDynamicScrollLock(); 
+  });
 </script>
+
 </body>
 </html>
