@@ -83,7 +83,16 @@
 
     .preview-row{ width:100%; height:160px; position:relative; margin-bottom:18px; }
     .visualizer-container{ width:100%; height:100%; display:flex; justify-content:center; align-items:center; }
-    #vector-rect{ transition:all .25s cubic-bezier(.25,.1,.25,1); }
+    
+    #vector-rect{ 
+      transition: all .25s cubic-bezier(.25,.1,.25,1); 
+      border-radius: 12px;
+      box-shadow: inset 0 0 0 1px rgba(0,0,0,0.08);
+      background: #808080;
+    }
+    @media (prefers-color-scheme: dark){
+      #vector-rect{ box-shadow: inset 0 0 0 1px rgba(255,255,255,0.1); }
+    }
 
     .section{ display:flex; flex-direction:column; align-items:center; width:100%; margin-bottom:18px; }
     .sub-label{ font-size:12px; font-weight:700; color:var(--ios-sub); text-transform:uppercase; letter-spacing:.8px; }
@@ -108,7 +117,6 @@
       .res-toolbar{ background: #0b0b0c; border: 1px solid #1f1f22; backdrop-filter: none; }
     }
 
-    /* RE-STYLED TOOLBAR BUTTONS */
     .tb-btn{
       flex: 1 1 0; min-width: 0; height: 44px; 
       border: 1px solid var(--ios-sep);
@@ -126,7 +134,6 @@
     .tb-btn svg{ width: 22px; height: 22px; display:block; stroke: currentColor; }
     .tb-text{ font-weight: 900; font-size: 16px; letter-spacing: .2px; line-height: 1; color: currentColor; }
 
-    /* "Pressed" State for Toggles */
     .tb-btn.tb-toggle-selected{
       border-color: var(--toggle-border); 
       color: var(--toggle-color); 
@@ -152,7 +159,6 @@
     .btn:active{ transform:scale(.99); }
     .btn-alt{ background:#e2e8f0; color:#0f172a; }
 
-    /* RE-STYLED PLUS/MINUS BUTTONS */
     #minusBtn, #plusBtn{ 
       width: 36px; height: 36px; padding: 0; 
       border-radius: 6px; 
@@ -198,7 +204,7 @@
       box-sizing: border-box;
     }
 
-    .color-row .row-label{ width:108px; font-size:12px; font-weight:800; color:#64748b; text-transform:uppercase; letter-spacing:.6px; flex:0 0 auto; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .color-row .row-label{ width:114px; font-size:12px; font-weight:800; color:#64748b; text-transform:uppercase; letter-spacing:.6px; flex:0 0 auto; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
     .color-row input.color-text{ flex:1 1 auto; min-width:0; width:auto; text-align:left; padding:10px 10px; font-size:15px; }
 
     .picker-wrap{ position:relative; width:34px; height:34px; flex:0 0 auto; }
@@ -278,10 +284,7 @@
 
   <div class="preview-row">
     <div class="visualizer-container" id="svg-container">
-      <svg id="vector-preview" width="100%" height="100%">
-        <defs><linearGradient id="previewGradient"></linearGradient></defs>
-        <rect id="vector-rect" rx="10" fill="url(#previewGradient)"></rect>
-      </svg>
+      <div id="vector-rect"></div>
     </div>
   </div>
 
@@ -319,8 +322,9 @@
           <path d="M4 7h16" /><path d="M16 3l4 4-4 4" /><path d="M20 17H4" /><path d="M8 13l-4 4 4 4" />
         </svg>
       </button>
+      <button class="tb-btn" id="tbType" type="button" aria-label="Toggle Gradient Type" title="Toggle Angular/Linear">
+        </button>
       <button class="tb-btn" id="tbX2" type="button" aria-label="Toggle x2 scale"><span class="tb-text">x2</span></button>
-      <button class="tb-btn" id="tbX3" type="button" aria-label="Toggle x3 scale"><span class="tb-text">x3</span></button>
     </div>
   </div>
 
@@ -415,6 +419,23 @@
   </div>
 
 <script>
+  "use strict";
+
+  // --- Dynamic Gradient Type Logic ---
+  const SVG_LINEAR = `<svg xmlns="http://www.w3.org/2000/svg" id="Layer_2" viewBox="49.279998779296875 49.279998779296875 925.43994140625 925.43994140625"><defs><linearGradient id="linear-gradient-icon" x1="85.28" y1="512" x2="938.72" y2="512" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="currentColor"/><stop offset="1" stop-color="currentColor" stop-opacity="0"/></linearGradient></defs><path d="M186.43,85.28h651.14c55.83,0,101.15,45.33,101.15,101.15v651.14c0,55.83-45.33,101.15-101.15,101.15H186.43c-55.83,0-101.15-45.33-101.15-101.15V186.43c0-55.83,45.33-101.15,101.15-101.15Z" fill="url(#linear-gradient-icon)" stroke="none"/><path d="M837.57,120.28c36.48,0,66.15,29.68,66.15,66.15v651.14c0,36.48-29.68,66.15-66.15,66.15H186.43c-36.48,0-66.15-29.68-66.15-66.15V186.43c0-36.48,29.68-66.15,66.15-66.15h651.14M837.57,50.28H186.43c-75.2,0-136.15,60.96-136.15,136.15v651.14c0,75.2,60.96,136.15,136.15,136.15h651.14c75.2,0,136.15-60.96,136.15-136.15V186.43c0-75.2-60.96-136.15-136.15-136.15h0Z" fill="currentColor" stroke="none"/></svg>`;
+  const SVG_ANGULAR = `<svg xmlns="http://www.w3.org/2000/svg" id="Layer_2" viewBox="49.279998779296875 49.279998779296875 925.43994140625 925.43994140625"><defs><clipPath id="innerSquareClip"><path d="M186.43,85.28h651.14c55.83,0,101.15,45.33,101.15,101.15v651.14c0,55.83-45.33,101.15-101.15,101.15H186.43c-55.83,0-101.15-45.33-101.15-101.15V186.43c0-55.83,45.33-101.15,101.15-101.15Z"/></clipPath></defs><path fill="currentColor" stroke="none" d="M837.57,120.28c36.48,0,66.15,29.68,66.15,66.15v651.14c0,36.48-29.68,66.15-66.15,66.15H186.43c-36.48,0-66.15-29.68-66.15-66.15V186.43c0-36.48,29.68-66.15,66.15-66.15h651.14M837.57,50.28H186.43c-75.2,0-136.15,60.96-136.15,136.15v651.14c0,75.2,60.96,136.15,136.15,136.15h651.14c75.2,0,136.15-60.96,136.15-136.15V186.43c0-75.2-60.96-136.15-136.15-136.15h0Z"/><foreignObject x="49" y="49" width="926" height="926" clip-path="url(#innerSquareClip)"><div xmlns="http://www.w3.org/1999/xhtml" style="width: 100%; height: 100%; background: conic-gradient(from 0deg, currentColor, transparent);"></div></foreignObject></svg>`;
+  
+  let gradientType = 'linear'; // 'linear' or 'angular'
+  const tbType = document.getElementById('tbType');
+  tbType.innerHTML = SVG_LINEAR;
+
+  tbType.addEventListener('click', () => {
+    gradientType = (gradientType === 'linear') ? 'angular' : 'linear';
+    tbType.innerHTML = gradientType === 'linear' ? SVG_LINEAR : SVG_ANGULAR;
+    updateColorLabels();
+    updatePreviewGradient();
+  });
+
   let preventTouchMove = (e) => e.preventDefault();
 
   function setScrollLock(locked){
@@ -429,7 +450,7 @@
     } else {
       html.classList.add('scrollable');
       body.classList.add('scrollable');
-      document.removeEventListener('touchmove', preventTouchMove, { passive:false });
+      document.removeEventListener('touchmove', preventTouchMove);
     }
   }
 
@@ -448,7 +469,6 @@
   const tbAngle   = document.getElementById('tbAngle');
   const tbSwap    = document.getElementById('tbSwap');
   const tbX2      = document.getElementById('tbX2');
-  const tbX3      = document.getElementById('tbX3');
   const tbAngleRotator = document.getElementById('tbAngleRotator');
 
   let scaleMode = 1;
@@ -459,7 +479,7 @@
 
   function clearScaleSelection(){
     scaleMode = 1; baseW = null; baseH = null;
-    tbX2.classList.remove('tb-toggle-selected'); tbX3.classList.remove('tb-toggle-selected');
+    tbX2.classList.remove('tb-toggle-selected');
   }
 
   function applyScaleToInputs(){
@@ -471,7 +491,6 @@
   function setScaleMode(newMode){
     scaleMode = newMode;
     tbX2.classList.toggle('tb-toggle-selected', scaleMode === 2);
-    tbX3.classList.toggle('tb-toggle-selected', scaleMode === 3);
     if (scaleMode === 1){
       if (baseW !== null && baseH !== null){ resW.value = String(baseW); resH.value = String(baseH); }
       baseW = null; baseH = null;
@@ -500,7 +519,6 @@
 
   const svgContainer = document.getElementById('svg-container');
   const vectorRect = document.getElementById('vector-rect');
-  const gradEl = document.getElementById('previewGradient');
 
   const colorsList = document.getElementById('colorsList');
   const minusBtn = document.getElementById('minusBtn');
@@ -517,6 +535,18 @@
 
   let colorCount = 2;
   const DITHER_AMPLITUDE = 0.5;
+  
+  // Pre-compute dither noise map
+  const NOISE_SIZE = 4096;
+  const NOISE_MASK = NOISE_SIZE - 1;
+  const noiseTable = new Float32Array(NOISE_SIZE);
+  for(let i = 0; i < NOISE_SIZE; i++){
+    noiseTable[i] = ((Math.random() * 2) - 1) * DITHER_AMPLITUDE;
+  }
+
+  const colorParseCanvas = document.createElement('canvas');
+  colorParseCanvas.width = 1; colorParseCanvas.height = 1;
+  const colorParseCtx = colorParseCanvas.getContext('2d', { willReadFrequently: true });
 
   function openModal(){ modalBackdrop.classList.add('show'); }
   function closeModal(){ modalBackdrop.classList.remove('show'); }
@@ -618,7 +648,6 @@
     for (const p of RES_PRESETS){
       const btn = document.createElement('button');
       btn.type = 'button'; btn.className = 'preset-item';
-      
       btn.innerHTML = `
         <div class="preset-icon">${p.icon}</div>
         <div class="preset-info">
@@ -626,7 +655,6 @@
           <span class="preset-sub">${p.sub}</span>
         </div>
       `;
-      
       btn.addEventListener('click', () => {
         clearScaleSelection(); resW.value = String(p.w); resH.value = String(p.h);
         updatePreviewGradient(); closePresetModal();
@@ -646,7 +674,6 @@
   });
 
   tbX2.addEventListener('click', () => { (scaleMode === 2) ? setScaleMode(1) : setScaleMode(2); });
-  tbX3.addEventListener('click', () => { (scaleMode === 3) ? setScaleMode(1) : setScaleMode(3); });
   resW.addEventListener('input', () => { onUserManualResolutionEdit(); updatePreviewGradient(); });
   resH.addEventListener('input', () => { onUserManualResolutionEdit(); updatePreviewGradient(); });
 
@@ -708,23 +735,28 @@
     return s;
   }
 
-  function stopLabel(i,n){
-    if (n===2) return i===0 ? "Top" : "Bottom";
-    if (n===3) return i===0 ? "Top" : (i===1 ? "Middle" : "Bottom");
-    if (i===0) return "Color 1 (Top)";
-    if (i===n-1) return `Color ${n} (Bottom)`;
-    return `Color ${i+1}`;
+  function stopLabel(i, n){
+    if (gradientType === 'angular') {
+      const deg = Math.round((i / n) * 360);
+      return `Color ${i + 1} (${deg}°)`;
+    }
+    if (n === 2) return i === 0 ? "Top" : "Bottom";
+    if (n === 3) return i === 0 ? "Top" : (i === 1 ? "Middle" : "Bottom");
+    if (i === 0) return "Color 1 (Top)";
+    if (i === n - 1) return `Color ${n} (Bottom)`;
+    return `Color ${i + 1}`;
   }
 
   function parseToRGB255(norm){
-    const t = document.createElement('canvas'); t.width=1; t.height=1; const c = t.getContext('2d');
-    c.clearRect(0,0,1,1); c.fillStyle = '#000'; c.fillStyle = norm; c.fillRect(0,0,1,1);
-    const d = c.getImageData(0,0,1,1).data; return [d[0], d[1], d[2]];
+    colorParseCtx.clearRect(0,0,1,1); 
+    colorParseCtx.fillStyle = '#000'; 
+    colorParseCtx.fillStyle = norm; 
+    colorParseCtx.fillRect(0,0,1,1);
+    const d = colorParseCtx.getImageData(0,0,1,1).data; 
+    return [d[0], d[1], d[2]];
   }
 
-  function clampU8(v){ return v<0?0 : v>255?255 : (v|0); }
   function lerp(a,b,t){ return a+(b-a)*t; }
-  function randomSigned(){ return (Math.random()*2)-1; }
 
   function updateVectorAspect(){
     const w = parseFloat(resW.value)||1, h = parseFloat(resH.value)||1;
@@ -732,15 +764,8 @@
     const scale = 0.82; const maxW = cw*scale, maxH = ch*scale;
     let rw = maxW, rh = (maxW / w) * h;
     if (rh > maxH) { rh = maxH; rw = (maxH / h) * w; }
-    vectorRect.setAttribute('x', (cw-rw)/2); vectorRect.setAttribute('y', (ch-rh)/2);
-    vectorRect.setAttribute('width', rw); vectorRect.setAttribute('height', rh);
-  }
-
-  function gradientEndpointsFromAngleDeg(deg){
-    const rad = deg * Math.PI / 180;
-    const dx = -Math.sin(rad), dy = Math.cos(rad), cx=0.5, cy=0.5;
-    const sx = (dx===0)?Infinity:0.5/Math.abs(dx), sy = (dy===0)?Infinity:0.5/Math.abs(dy);
-    const s = Math.min(sx, sy); return { x1: cx-dx*s, y1: cy-dy*s, x2: cx+dx*s, y2: cy+dy*s };
+    vectorRect.style.width = rw + 'px';
+    vectorRect.style.height = rh + 'px';
   }
 
   function getColorValuesForPreview(){
@@ -757,24 +782,21 @@
   function updatePreviewGradient(){
     updateVectorAspect();
     const deg = normalizeAngleDeg(angleDegInput.value);
-    gradEl.innerHTML = '';
     const cols = getColorValuesForPreview();
-    const ep = gradientEndpointsFromAngleDeg(deg);
-    gradEl.setAttribute('gradientUnits','objectBoundingBox');
-    gradEl.setAttribute('x1', ep.x1); gradEl.setAttribute('y1', ep.y1);
-    gradEl.setAttribute('x2', ep.x2); gradEl.setAttribute('y2', ep.y2);
-
+    
     if (!cols || cols.length < 2) {
-      const s0 = document.createElementNS('http://www.w3.org/2000/svg','stop'); s0.setAttribute('offset','0%'); s0.setAttribute('stop-color','#808080');
-      const s1 = document.createElementNS('http://www.w3.org/2000/svg','stop'); s1.setAttribute('offset','100%'); s1.setAttribute('stop-color','#808080');
-      gradEl.appendChild(s0); gradEl.appendChild(s1); return;
+      vectorRect.style.background = '#808080';
+      return;
     }
 
-    const n = cols.length;
-    for (let i=0;i<n;i++){
-      const stop = document.createElementNS('http://www.w3.org/2000/svg','stop');
-      stop.setAttribute('offset', ((i/(n-1))*100).toFixed(4)+'%');
-      stop.setAttribute('stop-color', cols[i]); gradEl.appendChild(stop);
+    if (gradientType === 'linear') {
+      let cssAngle = (deg + 180) % 360;
+      vectorRect.style.background = `linear-gradient(${cssAngle}deg, ${cols.join(', ')})`;
+    } else {
+      const n = cols.length;
+      let cssStops = cols.map((c, i) => `${c} ${(i/n)*100}%`).join(', ');
+      cssStops += `, ${cols[0]} 100%`;
+      vectorRect.style.background = `conic-gradient(from ${deg}deg, ${cssStops})`;
     }
   }
 
@@ -830,8 +852,19 @@
 
   async function tryShareOrDownload(blob, filename){
     const file = new File([blob], filename, { type:'image/png' });
-    if (navigator.canShare && navigator.canShare({ files:[file] })) { await navigator.share({ files:[file], title: filename }); return `Share sheet opened: ${filename}`; }
-    const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = filename; document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(url), 1000); return `Downloaded: ${filename}`;
+    if (navigator.canShare && navigator.canShare({ files:[file] })) { 
+      await navigator.share({ files:[file], title: filename }); 
+      return `Share sheet opened: ${filename}`; 
+    }
+    const url = URL.createObjectURL(blob); 
+    const a = document.createElement('a'); 
+    a.href = url; 
+    a.download = filename; 
+    document.body.appendChild(a); 
+    a.click(); 
+    a.remove(); 
+    setTimeout(() => URL.revokeObjectURL(url), 60000); 
+    return `Downloaded: ${filename}`;
   }
 
   let pendingShare = null;
@@ -848,33 +881,77 @@
     if (n === 1) { ctx.fillStyle = `rgb(${rgbStops[0][0]},${rgbStops[0][1]},${rgbStops[0][2]})`; ctx.fillRect(0,0,width,height); onProgress && onProgress(100); return; }
 
     const img = ctx.createImageData(width, height); const data = img.data;
-    const rad = angleDeg * Math.PI / 180; const ax = -Math.sin(rad); const ay =  Math.cos(rad);
-    const aspect = width/height;
-    const corners = [ [-0.5*aspect, -0.5], [ 0.5*aspect, -0.5], [-0.5*aspect,  0.5], [ 0.5*aspect,  0.5] ];
-    let extent = 0; for (const [cx,cy] of corners) extent = Math.max(extent, Math.abs(cx*ax + cy*ay)); if (extent === 0) extent = 1;
+    
+    if (gradientType === 'linear') {
+      const rad = angleDeg * Math.PI / 180; const ax = -Math.sin(rad); const ay =  Math.cos(rad);
+      const aspect = width/height;
+      const corners = [ [-0.5*aspect, -0.5], [ 0.5*aspect, -0.5], [-0.5*aspect,  0.5], [ 0.5*aspect,  0.5] ];
+      let extent = 0; for (const [cx,cy] of corners) extent = Math.max(extent, Math.abs(cx*ax + cy*ay)); if (extent === 0) extent = 1;
 
-    const positions = computeStopPositions(n);
-    const rowsPerChunk = Math.max(1, Math.floor(height / 120)); let y = 0;
+      const positions = computeStopPositions(n);
+      const rowsPerChunk = Math.max(1, Math.floor(height / 120)); let y = 0;
 
-    while (y < height){
-      const yEnd = Math.min(height, y + rowsPerChunk);
-      for (let yy=y; yy<yEnd; yy++){
-        const ny = (yy/(height-1)) - 0.5;
-        for (let x=0;x<width;x++){
-          const nx = ((x/(width-1)) - 0.5) * aspect;
-          let t = (nx*ax + ny*ay) / (2*extent) + 0.5; if (t<0) t=0; if (t>1) t=1;
-          const si = findSegmentIndex(t, positions); const t0 = positions[si], t1 = positions[si+1]; const lt = (t1===t0)?0:((t-t0)/(t1-t0));
-          const c0 = rgbStops[si], c1 = rgbStops[si+1];
-          let r = lerp(c0[0], c1[0], lt), g = lerp(c0[1], c1[1], lt), b = lerp(c0[2], c1[2], lt);
+      while (y < height){
+        const yEnd = Math.min(height, y + rowsPerChunk);
+        for (let yy=y; yy<yEnd; yy++){
+          const ny = (yy/(height-1)) - 0.5;
+          for (let x=0;x<width;x++){
+            const nx = ((x/(width-1)) - 0.5) * aspect;
+            let t = (nx*ax + ny*ay) / (2*extent) + 0.5; if (t<0) t=0; if (t>1) t=1;
+            const si = findSegmentIndex(t, positions); const t0 = positions[si], t1 = positions[si+1]; const lt = (t1===t0)?0:((t-t0)/(t1-t0));
+            const c0 = rgbStops[si], c1 = rgbStops[si+1];
+            let r = lerp(c0[0], c1[0], lt), g = lerp(c0[1], c1[1], lt), b = lerp(c0[2], c1[2], lt);
 
-          if (DITHER_AMPLITUDE>0){ r += randomSigned()*DITHER_AMPLITUDE; g += randomSigned()*DITHER_AMPLITUDE; b += randomSigned()*DITHER_AMPLITUDE; }
-
-          const idx = (yy*width + x)*4;
-          data[idx+0] = clampU8(Math.round(r)); data[idx+1] = clampU8(Math.round(g)); data[idx+2] = clampU8(Math.round(b)); data[idx+3] = 255;
+            const idx = (yy*width + x)*4;
+            if (DITHER_AMPLITUDE > 0) {
+              const noise = noiseTable[(x + yy * 137) & NOISE_MASK];
+              data[idx+0] = r + noise; data[idx+1] = g + noise; data[idx+2] = b + noise; data[idx+3] = 255;
+            } else {
+              data[idx+0] = r; data[idx+1] = g; data[idx+2] = b; data[idx+3] = 255;
+            }
+          }
         }
+        y = yEnd; onProgress && onProgress((y / height) * 100); await new Promise(requestAnimationFrame);
       }
-      y = yEnd; onProgress && onProgress((y / height) * 100); await new Promise(requestAnimationFrame);
+    } else {
+      const cx = width / 2;
+      const cy = height / 2;
+      const radOffset = angleDeg * Math.PI / 180;
+      const rowsPerChunk = Math.max(1, Math.floor(height / 120)); let y = 0;
+
+      while (y < height){
+        const yEnd = Math.min(height, y + rowsPerChunk);
+        for (let yy=y; yy<yEnd; yy++){
+          const dy = yy - cy;
+          for (let x=0;x<width;x++){
+            const dx = x - cx;
+            let a = Math.atan2(dy, dx) + (Math.PI / 2) - radOffset;
+            a = a % (2 * Math.PI);
+            if (a < 0) a += 2 * Math.PI;
+            
+            const t = a / (2 * Math.PI);
+            
+            const scaledT = t * n;
+            const index1 = Math.floor(scaledT) % n;
+            const index2 = (index1 + 1) % n;
+            const localT = scaledT - Math.floor(scaledT);
+            
+            const c0 = rgbStops[index1], c1 = rgbStops[index2];
+            let r = lerp(c0[0], c1[0], localT), g = lerp(c0[1], c1[1], localT), b = lerp(c0[2], c1[2], localT);
+
+            const idx = (yy*width + x)*4;
+            if (DITHER_AMPLITUDE > 0) {
+              const noise = noiseTable[(x + yy * 137) & NOISE_MASK];
+              data[idx+0] = r + noise; data[idx+1] = g + noise; data[idx+2] = b + noise; data[idx+3] = 255;
+            } else {
+              data[idx+0] = r; data[idx+1] = g; data[idx+2] = b; data[idx+3] = 255;
+            }
+          }
+        }
+        y = yEnd; onProgress && onProgress((y / height) * 100); await new Promise(requestAnimationFrame);
+      }
     }
+    
     ctx.putImageData(img, 0, 0); onProgress && onProgress(100);
   }
 
@@ -922,14 +999,12 @@
     let placeholder = null;
 
     const onPointerMoveDrag = (moveEvent) => {
-      if (!isDragging) return;
-      moveEvent.preventDefault(); // Take over from native scroll
+      if (!isDragging || !placeholder) return;
+      moveEvent.preventDefault(); 
       const currentY = moveEvent.clientY;
       
-      // Visually move the floating row 1:1 with the pointer
       row.style.top = (currentY - offsetY) + 'px';
 
-      // Find where the placeholder should logically go
       const siblings = Array.from(colorsList.querySelectorAll('.color-row:not(.is-dragging)'));
       let targetSibling = null;
       
@@ -953,14 +1028,14 @@
       if (!isDragging) return;
       isDragging = false;
       
-      // Re-insert the actual row at the placeholder's calculated position
-      colorsList.insertBefore(row, placeholder);
-      
-      // Destroy the placeholder
-      placeholder.remove();
+      if (placeholder && placeholder.parentNode === colorsList) {
+        colorsList.insertBefore(row, placeholder);
+        placeholder.remove();
+      } else {
+        colorsList.appendChild(row); 
+      }
       placeholder = null;
       
-      // Clean up row styling to return it to the normal DOM flow
       row.classList.remove('is-dragging');
       row.style.position = '';
       row.style.top = '';
@@ -975,10 +1050,9 @@
       pendingShare = null;
       updateColorLabels();
       updatePreviewGradient();
-      updateDynamicScrollLock(); // Release the forced drag scroll lock
+      updateDynamicScrollLock(); 
     };
 
-    // Initialize Long Press
     handle.addEventListener('pointerdown', (e) => {
       if (e.button !== 0 && e.pointerType === 'mouse') return;
       
@@ -988,21 +1062,18 @@
         isDragging = true;
         dragTimer = null;
         
-        if (navigator.vibrate) navigator.vibrate(40); // Subtle Haptic pop on lift
+        if (navigator.vibrate) navigator.vibrate(40); 
         
-        setScrollLock(true); // Force lock the document scroll for drag fidelity
+        setScrollLock(true); 
         
-        // 1. Calculate geometry before pulling it out of the flow
         const rect = row.getBoundingClientRect();
-        offsetY = startY - rect.top; // Grabs the exact offset of where the finger clicked
+        offsetY = startY - rect.top; 
         
-        // 2. Create and insert the placeholder to prevent DOM collapse
         placeholder = document.createElement('div');
         placeholder.className = 'color-row-placeholder';
         placeholder.style.height = rect.height + 'px';
         colorsList.insertBefore(placeholder, row);
         
-        // 3. Elevate the actual row out of the DOM flow
         row.style.position = 'fixed';
         row.style.top = rect.top + 'px';
         row.style.left = rect.left + 'px';
@@ -1013,11 +1084,10 @@
         document.addEventListener('pointermove', onPointerMoveDrag, { passive: false });
         document.addEventListener('pointerup', onPointerUpDrag);
         document.addEventListener('pointercancel', onPointerUpDrag);
-      }, 350); // 350 milliseconds hold to enter rearrange mode
+      }, 350); 
     });
 
     handle.addEventListener('pointermove', (e) => {
-      // If the user moves their finger significantly before the timer pops, cancel the hold
       if (dragTimer && Math.abs(e.clientY - startY) > 10) {
         clearTimeout(dragTimer);
         dragTimer = null;
@@ -1032,7 +1102,6 @@
       if (dragTimer) { clearTimeout(dragTimer); dragTimer = null; }
     });
     
-    // Prevent default iOS text selection or long-press context menus over the handle
     handle.addEventListener('contextmenu', e => e.preventDefault());
   }
 
@@ -1087,7 +1156,10 @@
         colorsList.appendChild(createColorRowElement(defaultHex));
       }
     } else if (currentRows > colorCount) {
-      for (let i = currentRows; i > colorCount; i--) { colorsList.removeChild(colorsList.lastChild); }
+      for (let i = currentRows; i > colorCount; i--) { 
+        const node = colorsList.lastChild;
+        if(node) colorsList.removeChild(node); 
+      }
     }
     updateColorLabels();
     updateDynamicScrollLock(); 
