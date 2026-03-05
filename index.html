@@ -66,10 +66,8 @@
       .modal-text{ color:#d1d5db; }
       .modal-close{ background:#2c2c2e; color:#fff; border:1px solid #3a3a3c; }
 
-      .tb-btn, #minusBtn, #plusBtn {
-        background: #2c2c2e !important;
-        color: #8e8e93 !important;
-      }
+      /* Preserve specific icon text color in dark mode */
+      .tb-btn, #minusBtn, #plusBtn { color: #8e8e93 !important; }
     }
 
     html.locked, body.locked{ overflow:hidden; position:fixed; touch-action:none; }
@@ -103,7 +101,8 @@
     }
 
     .tb-btn{
-      flex: 1 1 0; min-width: 0; height: 44px; border: none; border-radius: 14px; background: #F2F2F6;
+      flex: 1 1 0; min-width: 0; height: 44px; border: none; border-radius: 14px; 
+      background: var(--ios-btn); 
       color: #85858B; display:flex; align-items:center; justify-content:center; gap: 8px; -webkit-appearance:none;
       padding: 0 10px; box-shadow: 0 0.5px 0 rgba(0,0,0,.08) inset; user-select:none; -webkit-tap-highlight-color: transparent; outline: none;
     }
@@ -128,29 +127,47 @@
     .info-btn{ border:none; background:transparent; padding:6px 6px; margin:0; font-weight:600; font-size:16px; line-height:1; border-radius:10px; color:var(--ios-text); -webkit-appearance:none; }
     .info-btn:active{ transform:scale(.98); }
 
-    .btn-row{ display:flex; gap:10px; }
+    .btn-row{ display:flex; gap:10px; align-items: center; }
     .btn, .btn-alt{ border:none; border-radius:12px; padding:10px 14px; font-weight:800; font-size:18px; -webkit-appearance:none; }
     .btn{ background:#2563eb; color:#fff; }
     .btn:active{ transform:scale(.99); }
     .btn-alt{ background:#e2e8f0; color:#0f172a; }
 
     #minusBtn, #plusBtn{ 
-      width: 44px; height: 44px; padding: 0; border-radius: 999px; display:flex; align-items:center; justify-content:center; 
-      -webkit-tap-highlight-color: transparent; user-select:none; background: #F2F2F6; color: #85858B; border: none;
+      width: 36px; height: 36px; padding: 0; border-radius: 999px; display:flex; align-items:center; justify-content:center; 
+      -webkit-tap-highlight-color: transparent; user-select:none; 
+      background: var(--ios-btn); 
+      color: #85858B; border: none;
     }
-    #minusBtn svg, #plusBtn svg{ width: 28px; height: 28px; display: block; }
+    #minusBtn svg, #plusBtn svg{ width: 22px; height: 22px; display: block; }
+    #minusBtn:active, #plusBtn:active{ transform:scale(.95); background: var(--ios-btn-press); }
 
     .colors-list{ display:flex; flex-direction:column; gap:10px; width:100%; }
     
     .color-row{ 
       display:flex; align-items:center; gap:8px; width:100%; flex-wrap:nowrap; min-width:0; 
-      position: relative; transition: box-shadow 0.2s, transform 0.2s; background: transparent; border-radius: 12px;
+      position: relative; 
+      transition: box-shadow 0.25s cubic-bezier(0.2, 0.8, 0.2, 1), transform 0.25s cubic-bezier(0.2, 0.8, 0.2, 1); 
+      background: transparent; border-radius: 12px;
     }
+    
     .color-row.is-dragging {
-      z-index: 100; opacity: 0.85; background: var(--ios-card); box-shadow: 0 10px 30px rgba(0,0,0,0.15); transform: scale(1.02);
+      z-index: 9999; 
+      opacity: 0.95; 
+      background: var(--ios-card); 
+      box-shadow: 0 15px 35px rgba(0,0,0,0.25); 
+      transform: scale(1.03);
     }
     @media (prefers-color-scheme: dark) {
-      .color-row.is-dragging { background: #2c2c2e; box-shadow: 0 10px 30px rgba(0,0,0,0.4); }
+      .color-row.is-dragging { background: #2c2c2e; box-shadow: 0 15px 35px rgba(0,0,0,0.6); }
+    }
+
+    .color-row-placeholder {
+      width: 100%;
+      border-radius: 12px;
+      background: rgba(120, 120, 128, 0.08);
+      border: 2px dashed var(--ios-sep);
+      box-sizing: border-box;
     }
 
     .color-row .row-label{ width:108px; font-size:12px; font-weight:800; color:#64748b; text-transform:uppercase; letter-spacing:.6px; flex:0 0 auto; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
@@ -160,9 +177,7 @@
     .picker-ios{ position:absolute; inset:0; border-radius:999px; background:conic-gradient(#ff3b30,#ff9500,#ffcc00,#34c759,#00c7be,#007aff,#5856d6,#af52de,#ff2d55,#ff3b30); display:flex; align-items:center; justify-content:center; box-shadow:none; }
     .picker-ios::before{ content:""; width:25px; height:25px; border-radius:999px; background:rgba(255,255,255,.92); box-shadow:0 0 0 .5px rgba(0,0,0,.12); }
     .picker-center{ position:absolute; left:50%; top:50%; transform:translate(-50%,-50%); width:18px; height:18px; border-radius:999px; background:#fff; box-shadow:0 0 0 1.5px rgba(255,255,255,.95), 0 0 0 .5px rgba(0,0,0,.20); }
-    
-    /* Updated generic target class for the custom transparent button */
-    .color-native{ position:absolute; inset:0; opacity:.001; width:100%; height:100%; border:none; padding:0; margin:0; -webkit-appearance:none; background:transparent; cursor:pointer; }
+    input.color-native{ position:absolute; inset:0; opacity:.001; width:100%; height:100%; border:none; padding:0; margin:0; -webkit-appearance:none; background:transparent; }
 
     .drag-handle {
       flex: 0 0 auto; width: 34px; height: 34px; display: flex; align-items: center; justify-content: center;
@@ -197,9 +212,28 @@
     .deg-angle-row{ display:flex; justify-content:center; align-items:center; margin: 2px 0 14px 0; }
     .deg-angle-input{ width: 96px; padding: 10px 10px; font-size: 18px; font-weight: 800; text-align: center; border-radius: 12px; border: 1px solid rgba(60,60,67,.22); -webkit-appearance: none; outline: none; background: rgba(120,120,128,.10); color: var(--ios-text); box-sizing: border-box; }
     .deg-angle-input:focus{ border-color: var(--ios-blue); background: rgba(0,122,255,.08); }
-    .preset-row{ display:flex; justify-content:center; gap:10px; flex-wrap:nowrap; margin-bottom:10px; }
-    .preset-btn{ border:none; border-radius:12px; padding:8px 17px; font-weight:800; font-size:15px; background: var(--ios-btn); color: var(--ios-text); -webkit-appearance:none; min-width:0; white-space:nowrap; line-height:1; box-shadow: 0 0.5px 0 rgba(0,0,0,.08) inset; display:flex; align-items:center; justify-content:center; }
-    .preset-btn:active{ transform:scale(.99); background: var(--ios-btn-press); }
+    
+    /* RE-STYLED ANGLE PRESETS FOR PROFESSIONAL SOFTWARE LOOK */
+    .preset-row { 
+      display: flex; justify-content: space-between; gap: 6px; width: 100%; flex-wrap: nowrap; margin-bottom: 10px; 
+    }
+    .preset-btn { 
+      flex: 1 1 0; /* Forces exact equal width regardless of content */
+      height: 40px; /* Locked height for uniformity */
+      padding: 0;
+      border: 1px solid var(--ios-sep); /* Adds structured, rigid feel */
+      border-radius: 6px; /* Blockier than before */
+      font-weight: 800; font-size: 15px; 
+      background: var(--ios-btn); color: var(--ios-text); 
+      -webkit-appearance: none; min-width: 0; white-space: nowrap; line-height: 1; 
+      box-sizing: border-box;
+      box-shadow: 0 1px 2px rgba(0,0,0,.04); /* Subtly raised tactical look */
+      display: flex; align-items: center; justify-content: center; cursor: pointer;
+    }
+    .preset-btn:active { 
+      transform: scale(.97); background: var(--ios-btn-press); box-shadow: none; 
+    }
+    
     .deg-divider{ height:1px; background: var(--ios-sep); margin: 12px 0; }
     
     .preset-grid{ display:grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px; }
@@ -362,8 +396,6 @@
       </div>
     </div>
   </div>
-
-<script src="https://scottsimon1180.github.io/IOS-Gradient-Generator/colorPicker.js"></script>
 
 <script>
   let preventTouchMove = (e) => e.preventDefault();
@@ -869,11 +901,18 @@
     let dragTimer = null;
     let isDragging = false;
     let startY = 0;
+    let offsetY = 0;
+    let placeholder = null;
 
     const onPointerMoveDrag = (moveEvent) => {
       if (!isDragging) return;
       moveEvent.preventDefault(); // Take over from native scroll
       const currentY = moveEvent.clientY;
+      
+      // Visually move the floating row 1:1 with the pointer
+      row.style.top = (currentY - offsetY) + 'px';
+
+      // Find where the placeholder should logically go
       const siblings = Array.from(colorsList.querySelectorAll('.color-row:not(.is-dragging)'));
       let targetSibling = null;
       
@@ -887,19 +926,35 @@
       }
       
       if (targetSibling) {
-        colorsList.insertBefore(row, targetSibling);
+        colorsList.insertBefore(placeholder, targetSibling);
       } else {
-        colorsList.appendChild(row);
+        colorsList.appendChild(placeholder);
       }
     };
 
     const onPointerUpDrag = () => {
       if (!isDragging) return;
       isDragging = false;
+      
+      // Re-insert the actual row at the placeholder's calculated position
+      colorsList.insertBefore(row, placeholder);
+      
+      // Destroy the placeholder
+      placeholder.remove();
+      placeholder = null;
+      
+      // Clean up row styling to return it to the normal DOM flow
       row.classList.remove('is-dragging');
+      row.style.position = '';
+      row.style.top = '';
+      row.style.left = '';
+      row.style.width = '';
+      row.style.margin = '';
+      
       document.removeEventListener('pointermove', onPointerMoveDrag);
       document.removeEventListener('pointerup', onPointerUpDrag);
       document.removeEventListener('pointercancel', onPointerUpDrag);
+      
       pendingShare = null;
       updateColorLabels();
       updatePreviewGradient();
@@ -916,9 +971,26 @@
         isDragging = true;
         dragTimer = null;
         
-        if (navigator.vibrate) navigator.vibrate(40); // Haptic feedback on active
+        if (navigator.vibrate) navigator.vibrate(40); // Subtle Haptic pop on lift
         
         setScrollLock(true); // Force lock the document scroll for drag fidelity
+        
+        // 1. Calculate geometry before pulling it out of the flow
+        const rect = row.getBoundingClientRect();
+        offsetY = startY - rect.top; // Grabs the exact offset of where the finger clicked
+        
+        // 2. Create and insert the placeholder to prevent DOM collapse
+        placeholder = document.createElement('div');
+        placeholder.className = 'color-row-placeholder';
+        placeholder.style.height = rect.height + 'px';
+        colorsList.insertBefore(placeholder, row);
+        
+        // 3. Elevate the actual row out of the DOM flow
+        row.style.position = 'fixed';
+        row.style.top = rect.top + 'px';
+        row.style.left = rect.left + 'px';
+        row.style.width = rect.width + 'px';
+        row.style.margin = '0';
         row.classList.add('is-dragging');
         
         document.addEventListener('pointermove', onPointerMoveDrag, { passive: false });
@@ -943,7 +1015,7 @@
       if (dragTimer) { clearTimeout(dragTimer); dragTimer = null; }
     });
     
-    // Prevent text selection or long-press context menus on the handle
+    // Prevent default iOS text selection or long-press context menus over the handle
     handle.addEventListener('contextmenu', e => e.preventDefault());
   }
 
@@ -954,12 +1026,7 @@
     const wrap = document.createElement('div'); wrap.className = 'picker-wrap';
     const ring = document.createElement('div'); ring.className = 'picker-ios';
     const center = document.createElement('div'); center.className = 'picker-center'; center.style.background = '#ffffff';
-    
-    // REPLACED: Native color input removed. Created a transparent trigger button instead.
-    const customTrigger = document.createElement('button');
-    customTrigger.className = 'color-native'; 
-    customTrigger.type = 'button';
-    customTrigger.style.cursor = 'pointer';
+    const native = document.createElement('input'); native.className = 'color-native'; native.type = 'color'; native.value = '#ffffff';
     
     const dragHandle = document.createElement('div');
     dragHandle.className = 'drag-handle';
@@ -967,7 +1034,10 @@
     dragHandle.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>`;
 
     function setCenterHex(hex){ center.style.background = hex; }
-    
+    function syncNativeFromText(){
+      const norm = normalizeColorInput(txt.value);
+      if (norm && cssColorIsValid(norm)) { const rgb = parseToRGB255(norm); const hex = '#' + rgb.map(v=>v.toString(16).padStart(2,'0')).join(''); native.value = hex; setCenterHex(hex); }
+    }
     function syncCenterFromText(){
       const norm = normalizeColorInput(txt.value);
       if (norm && cssColorIsValid(norm)) { const rgb = parseToRGB255(norm); const hex = '#' + rgb.map(v=>v.toString(16).padStart(2,'0')).join(''); setCenterHex(hex); }
@@ -975,38 +1045,16 @@
 
     attachGhostClearBehavior(txt);
     txt.addEventListener('input', () => { pendingShare = null; updatePreviewGradient(); syncCenterFromText(); });
-    
-    // Initialize the visual dot
-    syncCenterFromText();
+    syncNativeFromText();
 
-    // REPLACED: The event listener now triggers your custom IOSColorPicker
-    customTrigger.addEventListener('click', () => {
-        pendingShare = null;
-        
-        // Ensure we pass a clean hex code to the picker
-        let currentHex = txt.value.trim().replace('#', '');
-        if (currentHex === '') currentHex = 'FFFFFF';
-        
-        // Instantiate the custom picker
-        const picker = new IOSColorPicker({
-            initialColor: currentHex,
-            onChange: (newHex) => {
-                // This callback fires every time the picker updates
-                txt.value = newHex;
-                txt.style.color = ''; 
-                delete txt.dataset.ghosting; 
-                delete txt.dataset.ghostValue;
-                setCenterHex('#' + newHex);
-                updatePreviewGradient();
-            }
-        });
-        
-        picker.open();
+    native.addEventListener('input', () => {
+      pendingShare = null; const hex = native.value.toLowerCase(); txt.value = hex.replace('#','');
+      txt.style.color = ''; delete txt.dataset.ghosting; delete txt.dataset.ghostValue;
+      setCenterHex(hex); updatePreviewGradient();
     });
+    txt.addEventListener('blur', syncNativeFromText);
 
-    txt.addEventListener('blur', syncCenterFromText);
-
-    wrap.appendChild(ring); wrap.appendChild(center); wrap.appendChild(customTrigger);
+    wrap.appendChild(ring); wrap.appendChild(center); wrap.appendChild(native);
     row.appendChild(lbl); row.appendChild(txt); row.appendChild(wrap); row.appendChild(dragHandle);
     
     setupDragHandle(row, dragHandle);
